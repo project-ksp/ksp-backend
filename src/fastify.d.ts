@@ -7,4 +7,6 @@ declare module "fastify" {
     db: typeof db;
     redis: typeof Redis;
   }
+
+  interface FastifyInstance extends FastifyJwtNamespace<> {}
 }

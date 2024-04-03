@@ -11,10 +11,13 @@
     "dev": "tsx watch --clear-screen=false src/index.ts",
     "prettier": "prettier --write .",
     "migrate": "drizzle-kit generate:pg",
+    "seed": "tsx ./src/db/seeders/index.ts",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "start": "node dist/index.js"
   },
   "devDependencies": {
+    "@fastify/type-provider-json-schema-to-ts": "^3.0.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/cli-color": "^2.0.6",
     "@types/node": "^20.10.4",
     "@types/pg": "^8.10.9",
@@ -33,6 +36,8 @@
   },
   "dependencies": {
     "@fastify/cors": "^8.4.2",
+    "@fastify/jwt": "^8.0.0",
+    "bcrypt": "^5.1.1",
     "drizzle-orm": "^0.29.1",
     "fastify": "^4.25.0",
     "fastify-plugin": "^4.5.1",

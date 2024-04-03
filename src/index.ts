@@ -1,6 +1,5 @@
 import fastify from "fastify";
 import { initDb } from "@/db";
-import { testRoutes } from "@/routes";
 import { env, Logger, Redis } from "@/utils";
 import { middleware } from "@/modules/middleware";
 
@@ -17,15 +16,22 @@ export const main = async () => {
   await Redis.initialize();
 
   server.register(middleware);
+
   server.register(import("@fastify/cors"), {
     maxAge: 600,
     origin: true,
     credentials: true,
   });
 
-  // Routes
-  server.register(testRoutes, {
-    prefix: `/${API_VERSION}/test`,
+  server.register(import("@fastify/jwt"), {
+    secret: env.APP_KEY,
+    sign: {
+      expiresIn: "15m",
+    },
+  });
+
+  server.register(import("@/routes"), {
+    prefix: `/${API_VERSION}`,
   });
 
   server.listen({ host: env.HOST, port: env.PORT }, (error, address) => {

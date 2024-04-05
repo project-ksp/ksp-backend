@@ -2,8 +2,8 @@ import bcrypt from "bcrypt";
 import type { loginRequestType } from "@/schemas/user.schema";
 import type { FastifyReply } from "fastify/types/reply";
 import type { FastifyRequest } from "fastify/types/request";
-import { InferSelectModel } from "drizzle-orm";
-import { branchHeads, owners, tellers, users } from "@/db/schemas";
+import type { InferSelectModel } from "drizzle-orm";
+import type { branchHeads, owners, tellers, users } from "@/db/schemas";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export async function authenticate(request: FastifyRequest<{ Body: loginRequestType }>, reply: FastifyReply) {
@@ -36,7 +36,7 @@ export async function authenticate(request: FastifyRequest<{ Body: loginRequestT
 export async function getAuthUserData(request: FastifyRequest, reply: FastifyReply) {
   const { id, role } = (await request.jwtVerify()) satisfies InferSelectModel<typeof users>;
 
-  let userData: InferSelectModel<typeof owners | typeof tellers | typeof branchHeads> | undefined = undefined;
+  let userData: InferSelectModel<typeof owners | typeof tellers | typeof branchHeads> | undefined;
   if (role === "owner") {
     userData = await request.db.query.owners.findFirst({
       where: (owners, { eq }) => eq(owners.userId, id),

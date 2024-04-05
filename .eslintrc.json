@@ -25,7 +25,8 @@
             "format": ["strictCamelCase"],
             "filter": { "regex": "\\d+", "match": false }
           }
-        ]
+        ],
+        "no-await-in-loop": "off"
       }
     }
   ],

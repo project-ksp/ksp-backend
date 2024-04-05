@@ -2,6 +2,8 @@ import bcrypt from "bcrypt";
 import type { loginRequestType } from "@/schemas/user.schema";
 import type { FastifyReply } from "fastify/types/reply";
 import type { FastifyRequest } from "fastify/types/request";
+import { InferSelectModel } from "drizzle-orm";
+import { branchHeads, owners, tellers, users } from "@/db/schemas";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export async function authenticate(request: FastifyRequest<{ Body: loginRequestType }>, reply: FastifyReply) {
@@ -32,22 +34,37 @@ export async function authenticate(request: FastifyRequest<{ Body: loginRequestT
 }
 
 export async function getAuthUserData(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = (await request.jwtVerify()) satisfies { id: number };
+  const { id, role } = (await request.jwtVerify()) satisfies InferSelectModel<typeof users>;
 
-  const user = await request.db.query.users.findFirst({
-    where: (users, { eq }) => eq(users.id, id),
-  });
-  if (!user) {
+  let userData: InferSelectModel<typeof owners | typeof tellers | typeof branchHeads> | undefined = undefined;
+  if (role === "owner") {
+    userData = await request.db.query.owners.findFirst({
+      where: (owners, { eq }) => eq(owners.userId, id),
+    });
+  } else if (role === "teller") {
+    userData = await request.db.query.tellers.findFirst({
+      where: (tellers, { eq }) => eq(tellers.userId, id),
+    });
+  } else if (role === "branch_head") {
+    userData = await request.db.query.branchHeads.findFirst({
+      where: (branchHeads, { eq }) => eq(branchHeads.userId, id),
+    });
+  } else {
+    reply.status(401).send({
+      message: "Invalid role",
+    });
+    return;
+  }
+
+  if (!userData) {
     reply.status(401).send({
       message: "Invalid user ID",
     });
     return;
   }
 
-  const { password, ...rest } = user;
-
   reply.send({
-    message: "Successfully authenticated",
-    data: rest,
+    message: "Fetched user data successfully",
+    data: userData,
   });
 }

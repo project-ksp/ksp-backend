@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { z } from "zod";
-// eslint-disable-next-line import/no-unassigned-import
 import "dotenv/config";
 
 const envSchema = z.object({

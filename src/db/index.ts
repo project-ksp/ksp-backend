@@ -4,7 +4,6 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as schema from "@/db/schemas";
 import { env, Logger } from "@/utils";
 
-// eslint-disable-next-line import/no-mutable-exports
 export let db: ReturnType<typeof drizzle<typeof schema>>;
 
 export const initDb = async () => {

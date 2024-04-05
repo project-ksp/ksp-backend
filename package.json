@@ -7,7 +7,7 @@
   "author": "Noverdi Ramadhan <64979175+noverdy@users.noreply.github.com>",
   "license": "none",
   "scripts": {
-    "lint": "xo",
+    "lint": "eslint src/",
     "dev": "tsx watch --clear-screen=false src/index.ts",
     "prettier": "prettier --write .",
     "migrate": "drizzle-kit generate:pg",
@@ -18,14 +18,18 @@
     "@types/cli-color": "^2.0.6",
     "@types/node": "^20.10.4",
     "@types/pg": "^8.10.9",
+    "@typescript-eslint/eslint-plugin": "^7.5.0",
+    "@typescript-eslint/parser": "^7.5.0",
     "cli-color": "^2.0.3",
     "dotenv": "^16.3.1",
     "drizzle-kit": "^0.20.6",
+    "eslint": "^8.57.0",
+    "eslint-config-xo": "^0.44.0",
+    "eslint-config-xo-typescript": "^4.0.0",
     "prettier": "^3.1.1",
     "tsc-alias": "^1.8.8",
     "tsx": "^3.12.7",
-    "typescript": "^5.3.3",
-    "xo": "^0.56.0"
+    "typescript": "^5.4.4"
   },
   "dependencies": {
     "@fastify/cors": "^8.4.2",
@@ -36,29 +40,5 @@
     "redis": "^4.6.11",
     "tsc": "^2.0.4",
     "zod": "^3.22.4"
-  },
-  "xo": {
-    "rules": {
-      "import/extensions": "off",
-      "@typescript-eslint/quotes": [
-        "error",
-        "double"
-      ],
-      "@typescript-eslint/indent": [
-        "error",
-        2
-      ],
-      "@typescript-eslint/object-curly-spacing": [
-        "error",
-        "always"
-      ],
-      "n/prefer-global/process": "off",
-      "@typescript-eslint/no-extraneous-class": "off",
-      "arrow-parens": [
-        "error",
-        "always"
-      ],
-      "@typescript-eslint/no-floating-promises": "off"
-    }
   }
 }

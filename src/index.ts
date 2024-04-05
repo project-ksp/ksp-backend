@@ -16,6 +16,8 @@ export const main = async () => {
 
   server.register(middleware);
 
+  server.register(import("@fastify/cookie"));
+
   server.register(import("@fastify/cors"), {
     maxAge: 600,
     origin: true,
@@ -24,8 +26,12 @@ export const main = async () => {
 
   server.register(import("@fastify/jwt"), {
     secret: env.APP_KEY,
+    cookie: {
+      cookieName: "token",
+      signed: false,
+    },
     sign: {
-      expiresIn: "15m",
+      expiresIn: "1d",
     },
   });
 

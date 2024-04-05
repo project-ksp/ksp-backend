@@ -2,6 +2,26 @@ import bcrypt from "bcrypt";
 import type { FastifyPluginAsyncJsonSchemaToTs } from "@fastify/type-provider-json-schema-to-ts";
 
 const authRoutes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _) => {
+  fastify.get("/me", async (request, reply) => {
+    const { id } = (await request.jwtVerify()) satisfies { id: number };
+
+    const user = await request.db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, id),
+    });
+    if (!user) {
+      reply.status(401).send({
+        message: "Invalid user ID",
+      });
+      return;
+    }
+
+    const { password, ...rest } = user;
+
+    reply.send({
+      message: "Successfully authenticated",
+      data: rest,
+    });
+  });
   fastify.post(
     "/login",
     {
@@ -17,11 +37,10 @@ const authRoutes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _) => {
         response: {
           default: {
             type: "object",
-            required: ["message", "token", "refreshToken"],
+            required: ["message", "token"],
             properties: {
               message: { type: "string" },
               token: { type: "string" },
-              refreshToken: { type: "string" },
             },
           },
           401: {
@@ -54,53 +73,14 @@ const authRoutes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _) => {
         role: user.role,
       });
 
-      const refreshToken = await reply.jwtSign({ id: user.id }, { expiresIn: "7d" });
-
-      reply.send({
-        message: "Login successful",
-        token,
-        refreshToken,
-      });
-    },
-  );
-
-  fastify.post(
-    "/refresh",
-    {
-      schema: {
-        headers: {
-          type: "object",
-          required: ["authorization"],
-          properties: {
-            authorization: { type: "string" },
-          },
-        },
-      },
-    },
-    async (request, reply) => {
-      const { id } = (await request.jwtVerify()) satisfies { id: number };
-
-      const user = await request.db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.id, id),
-      });
-
-      if (!user) {
-        reply.status(401).send({
-          message: "Invalid user ID",
+      reply
+        .setCookie("token", token, {
+          httpOnly: true,
+        })
+        .send({
+          message: "Login successful",
+          token,
         });
-        return;
-      }
-
-      const token = await reply.jwtSign({
-        id: user.id,
-        username: user.username,
-        role: user.role,
-      });
-
-      reply.send({
-        message: "Token refreshed",
-        token,
-      });
     },
   );
 };

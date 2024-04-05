@@ -9,7 +9,7 @@ async function seed() {
   await initDb();
   for (const [name, seeder] of Object.entries(seeders)) {
     try {
-      seeder.default();
+      await seeder.default();
       Logger.info("SEED", `Seeder ${name} has been executed successfully`);
     } catch (error) {
       Logger.error("SEED", `Seeder ${name} has been failed to execute.`);

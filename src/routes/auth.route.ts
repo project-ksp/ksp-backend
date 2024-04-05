@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { FastifyPluginAsyncJsonSchemaToTs } from "@fastify/type-provider-json-schema-to-ts";
+import type { FastifyPluginAsyncJsonSchemaToTs } from "@fastify/type-provider-json-schema-to-ts";
 
 const authRoutes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _) => {
   fastify.post(
@@ -78,7 +78,7 @@ const authRoutes: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _) => {
       },
     },
     async (request, reply) => {
-      const { id } = (await request.jwtVerify()) as { id: number };
+      const { id } = (await request.jwtVerify()) satisfies { id: number };
 
       const user = await request.db.query.users.findFirst({
         where: (users, { eq }) => eq(users.id, id),

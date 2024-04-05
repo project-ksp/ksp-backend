@@ -13,7 +13,7 @@ export const users = pgTable("users", {
 
 export const owners = pgTable("owners", {
   id: serial("id").primaryKey(),
-  user_id: serial("user_id")
+  userId: serial("user_id")
     .references(() => users.id)
     .notNull(),
   name: varchar("name", { length: 256 }).notNull(),
@@ -23,7 +23,7 @@ export const owners = pgTable("owners", {
 
 export const tellers = pgTable("tellers", {
   id: serial("id").primaryKey(),
-  user_id: serial("user_id")
+  userId: serial("user_id")
     .references(() => users.id)
     .notNull(),
   name: varchar("name", { length: 256 }).notNull(),
@@ -33,7 +33,7 @@ export const tellers = pgTable("tellers", {
 
 export const branchHeads = pgTable("branch_heads", {
   id: serial("id").primaryKey(),
-  user_id: serial("user_id")
+  userId: serial("user_id")
     .references(() => users.id)
     .notNull(),
   name: varchar("name", { length: 256 }).notNull(),

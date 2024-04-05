@@ -1,18 +1,18 @@
 import { Logger } from "@/utils";
 import { initDb } from "..";
 
-const seeders = {
-  User: import("./user.seeder"),
-};
-
 async function seed() {
+  const seeders = {
+    user: await import("./user.seeder"),
+  };
+
   await initDb();
   for (const [name, seeder] of Object.entries(seeders)) {
     try {
-      (await seeder).default();
-      Logger.info("SEED", `${name} seeder has been executed successfully`);
+      seeder.default();
+      Logger.info("SEED", `Seeder ${name} has been executed successfully`);
     } catch (error) {
-      Logger.error("SEED", `${name} seeder has been failed to execute.`);
+      Logger.error("SEED", `Seeder ${name} has been failed to execute.`);
       throw error;
     }
   }

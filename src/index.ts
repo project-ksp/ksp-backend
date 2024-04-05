@@ -3,7 +3,6 @@ import { initDb } from "@/db";
 import { env, Logger, Redis } from "@/utils";
 import { middleware } from "@/modules/middleware";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const API_VERSION = "v1";
 
 export const main = async () => {

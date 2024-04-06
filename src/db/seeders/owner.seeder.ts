@@ -6,12 +6,11 @@ export default async function seed() {
   const userData: typeof users.$inferInsert = {
     username: "owner",
     password: bcrypt.hashSync("owner", 10),
+    name: "Dummy Owner",
     role: "owner",
   };
 
-  const roleData: typeof owners.$inferInsert = {
-    name: "Dummy Owner",
-  };
+  const roleData: typeof owners.$inferInsert = {};
 
   const user = await db.insert(users).values(userData).returning();
   if (user[0]) {

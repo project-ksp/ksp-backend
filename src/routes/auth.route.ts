@@ -1,9 +1,9 @@
-import { getAuthUserData, authenticate } from "@/controllers/user.controller";
+import * as authController from "@/controllers/auth.controller";
 import type { FastifyInstance } from "fastify";
 
 const authRoutes = async (fastify: FastifyInstance) => {
-  fastify.get("/me", getAuthUserData);
-  fastify.post("/login", authenticate);
+  fastify.get("/me", authController.getAuthUserData);
+  fastify.post("/login", authController.authenticate);
 };
 
 export default authRoutes;

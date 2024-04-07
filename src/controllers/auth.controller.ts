@@ -3,7 +3,7 @@ import type { loginRequestType } from "@/schemas/user.schema";
 import type { FastifyReply } from "fastify/types/reply";
 import type { FastifyRequest } from "fastify/types/request";
 import type { InferSelectModel } from "drizzle-orm";
-import type { branchHeads, owners, tellers, users } from "@/db/schemas";
+import type { branchHeads, owners, tellers } from "@/db/schemas";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export async function authenticate(request: FastifyRequest<{ Body: loginRequestType }>, reply: FastifyReply) {
@@ -34,7 +34,7 @@ export async function authenticate(request: FastifyRequest<{ Body: loginRequestT
 }
 
 export async function getAuthUserData(request: FastifyRequest, reply: FastifyReply) {
-  const { id, role } = (await request.jwtVerify()) satisfies InferSelectModel<typeof users>;
+  const { id, role } = request.user;
 
   let userData: InferSelectModel<typeof owners | typeof tellers | typeof branchHeads> | undefined;
   if (role === "owner") {

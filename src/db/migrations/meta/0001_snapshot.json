@@ -1,6 +1,6 @@
 {
-  "id": "4d605ec0-b2e8-4a17-ad26-265c0debd29a",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "2a785013-e597-4513-9064-c75eff6e3b7c",
+  "prevId": "4d605ec0-b2e8-4a17-ad26-265c0debd29a",
   "version": "5",
   "dialect": "pg",
   "tables": {
@@ -17,12 +17,6 @@
         "user_id": {
           "name": "user_id",
           "type": "serial",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
@@ -76,12 +70,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -129,12 +117,6 @@
         "user_id": {
           "name": "user_id",
           "type": "serial",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
@@ -194,6 +176,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "role": {
           "name": "role",
           "type": "role",
@@ -241,8 +229,8 @@
   },
   "schemas": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   }
 }

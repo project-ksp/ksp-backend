@@ -5,9 +5,16 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1686356934306,
-      "tag": "0000_plain_killmonger",
-      "breakpoints": false
+      "when": 1712133398097,
+      "tag": "0000_cute_franklin_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1712402709413,
+      "tag": "0001_short_frog_thor",
+      "breakpoints": true
     }
   ]
 }

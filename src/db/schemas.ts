@@ -11,30 +11,3 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
-
-export const owners = pgTable("owners", {
-  id: serial("id").primaryKey(),
-  userId: serial("user_id")
-    .references(() => users.id)
-    .notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
-export const tellers = pgTable("tellers", {
-  id: serial("id").primaryKey(),
-  userId: serial("user_id")
-    .references(() => users.id)
-    .notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
-export const branchHeads = pgTable("branch_heads", {
-  id: serial("id").primaryKey(),
-  userId: serial("user_id")
-    .references(() => users.id)
-    .notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});

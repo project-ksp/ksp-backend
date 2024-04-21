@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import type { loginRequestType } from "@/schemas/user.schema";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import * as userService from "@/services/user.service";
@@ -7,17 +6,8 @@ import * as userService from "@/services/user.service";
 export async function authenticate(request: FastifyRequest<{ Body: loginRequestType }>, reply: FastifyReply) {
   const { username, password } = request.body;
 
-  const user = await userService.getUserByUsername(username);
-
-  if (!user || !bcrypt.compareSync(password, user.password)) {
-    reply.status(401).send({
-      message: "Invalid username or password",
-    });
-    return;
-  }
-
-  const { password: _, ...rest } = user;
-  const token = await reply.jwtSign(rest);
+  const user = await userService.authenticate(username, password);
+  const token = await reply.jwtSign(user);
 
   reply
     .setCookie("token", token, {

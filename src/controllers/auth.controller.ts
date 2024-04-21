@@ -18,9 +18,15 @@ export async function authenticate(request: FastifyRequest<{ Body: loginRequestT
         token,
       });
   } catch (error) {
-    reply.code(401).send({
-      message: error,
-    });
+    if (error instanceof Error) {
+      reply.code(401).send({
+        message: error.message,
+      });
+    } else {
+      reply.code(500).send({
+        message: "An error occurred while authenticating user",
+      });
+    }
   }
 }
 

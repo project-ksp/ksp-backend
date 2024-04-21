@@ -1,13 +1,6 @@
 import { db } from "@/db";
 import bcrypt from "bcrypt";
 
-export async function getAllUsers() {
-  return (await db.query.users.findMany()).map((user) => {
-    const { password, ...rest } = user;
-    return rest;
-  });
-}
-
 export async function authenticate(username: string, password: string) {
   const user = await db.query.users.findFirst({
     where: (users, { eq }) => eq(users.username, username),
@@ -18,6 +11,13 @@ export async function authenticate(username: string, password: string) {
 
   const { password: _, ...rest } = user;
   return rest;
+}
+
+export async function getAllUsers() {
+  return (await db.query.users.findMany()).map((user) => {
+    const { password, ...rest } = user;
+    return rest;
+  });
 }
 
 export async function getUserByID(id: number) {

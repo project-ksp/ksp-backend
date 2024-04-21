@@ -6,17 +6,22 @@ import * as userService from "@/services/user.service";
 export async function authenticate(request: FastifyRequest<{ Body: loginRequestType }>, reply: FastifyReply) {
   const { username, password } = request.body;
 
-  const user = await userService.authenticate(username, password);
-  const token = await reply.jwtSign(user);
-
-  reply
-    .setCookie("token", token, {
-      httpOnly: true,
-    })
-    .send({
-      message: "Login successful",
-      token,
+  try {
+    const user = await userService.authenticate(username, password);
+    const token = await reply.jwtSign(user);
+    reply
+      .setCookie("token", token, {
+        httpOnly: true,
+      })
+      .send({
+        message: "Login successful",
+        token,
+      });
+  } catch (error) {
+    reply.code(401).send({
+      message: error,
     });
+  }
 }
 
 export async function getAuthUserData(request: FastifyRequest, reply: FastifyReply) {

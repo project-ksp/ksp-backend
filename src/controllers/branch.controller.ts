@@ -6,6 +6,14 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import type { branchHeads, branches } from "@/db/schemas";
 import { ZodError } from "zod";
 
+export async function index(_request: FastifyRequest, reply: FastifyReply) {
+  const branches = await branchService.getAllBranches();
+  reply.send({
+    message: "Branches successfully fetched.",
+    data: branches,
+  });
+}
+
 export async function create(request: FastifyRequest, reply: FastifyReply) {
   const data = request.body as {
     branch: any;

@@ -1,5 +1,6 @@
 import { pgTable, serial, timestamp, varchar, text } from "drizzle-orm/pg-core";
 import { branchHeads } from "./branchHeads.schema";
+import { createInsertSchema } from "drizzle-zod";
 
 export const branches = pgTable("branches", {
   id: serial("id").primaryKey(),
@@ -14,3 +15,5 @@ export const branches = pgTable("branches", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const insertBranchSchema = createInsertSchema(branches);

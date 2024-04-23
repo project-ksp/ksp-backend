@@ -19,8 +19,8 @@ export const branchHeads = pgTable("branch_heads", {
   postalCode: varchar("postal_code", { length: 5 }).notNull(),
   phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
   education: educationEnum("education").notNull(),
-  profilePictureURL: varchar("profile_picture_url", { length: 256 }).notNull(),
-  idPictureURL: varchar("id_picture_url", { length: 256 }).notNull(),
+  profilePictureUrl: varchar("profile_picture_url", { length: 256 }).notNull(),
+  idPictureUrl: varchar("id_picture_url", { length: 256 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

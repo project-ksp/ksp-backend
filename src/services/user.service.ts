@@ -1,4 +1,5 @@
 import { db } from "@/db";
+import { users } from "@/db/schemas";
 import bcrypt from "bcrypt";
 
 export async function authenticate(username: string, password: string) {
@@ -30,4 +31,10 @@ export async function getUserByID(id: number) {
 
   const { password, ...rest } = user;
   return rest;
+}
+
+export async function createUser(data: typeof users.$inferInsert) {
+  data.password = bcrypt.hashSync(data.password, 10);
+  const user = await db.insert(users).values(data).returning();
+  return user;
 }

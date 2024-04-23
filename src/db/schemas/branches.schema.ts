@@ -8,7 +8,7 @@ export const branches = pgTable("branches", {
   kecamatan: varchar("kecamatan", { length: 256 }).notNull(),
   city: varchar("city", { length: 256 }).notNull(),
   postalCode: varchar("postal_code", { length: 5 }).notNull(),
-  headID: serial("head_id")
+  headId: serial("head_id")
     .references(() => branchHeads.id)
     .notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

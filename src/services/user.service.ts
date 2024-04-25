@@ -38,3 +38,14 @@ export async function createUser(data: typeof users.$inferInsert) {
   const user = await db.insert(users).values(data).returning();
   return user;
 }
+
+export async function generateCSV() {
+  const users = await db.query.users.findMany();
+  const headers = ["ID Cabang", "Username", "Pemilik Akun", "Jabatan"];
+
+  let rows = headers.join(",") + "\n";
+  users.forEach((user) => {
+    rows += `${user.id},"${user.username}","${user.name}","${user.role === "branch_head" ? "kepala cabang" : user.role}"\n`;
+  });
+  return rows;
+}

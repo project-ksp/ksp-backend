@@ -20,3 +20,8 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     });
   }
 }
+
+export async function download(_request: FastifyRequest, reply: FastifyReply) {
+  const data = await userService.generateCSV();
+  reply.header("Content-Disposition", "attachment; filename=\"users.csv\"").send(data);
+}

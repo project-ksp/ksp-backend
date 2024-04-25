@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
-import { branchHeads, educationEnum, genderEnum, religionEnum } from "../schemas";
+import { educationEnum, genderEnum, religionEnum } from "../schemas";
+import type { branchHeads } from "../schemas";
 
 export default async function branchHeadFactory(): Promise<typeof branchHeads.$inferInsert> {
   return {

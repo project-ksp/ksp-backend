@@ -1,7 +1,7 @@
 import fs from "fs";
 import util from "util";
 import { pipeline } from "stream";
-import { MultipartFile } from "@fastify/multipart";
+import type { MultipartFile } from "@fastify/multipart";
 import mime from "mime-types";
 import path from "path";
 import crypto from "crypto";

@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { branches } from "../schemas";
+import type { branches } from "../schemas";
 import { db } from "..";
 
 export default async function branchFactory(): Promise<typeof branches.$inferInsert> {
@@ -14,5 +14,6 @@ export default async function branchFactory(): Promise<typeof branches.$inferIns
   if (headId) {
     Object.assign(branch, { headId: headId.id });
   }
+
   return branch;
 }

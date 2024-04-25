@@ -3,6 +3,8 @@ import { initDb } from "..";
 
 async function seed() {
   const seeders = {
+    branchHead: await import("./branchHead.seeder"),
+    branch: await import("./branch.seeder"),
     user: await import("./user.seeder"),
   };
 

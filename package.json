@@ -16,6 +16,7 @@
     "start": "node dist/index.js"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@types/bcrypt": "^5.0.2",
     "@types/cli-color": "^2.0.6",
     "@types/mime-types": "^2.1.4",

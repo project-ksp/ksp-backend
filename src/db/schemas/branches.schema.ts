@@ -1,4 +1,4 @@
-import { pgTable, serial, timestamp, varchar, text } from "drizzle-orm/pg-core";
+import { pgTable, serial, timestamp, varchar, text, integer } from "drizzle-orm/pg-core";
 import { branchHeads } from "./branchHeads.schema";
 import { createInsertSchema } from "drizzle-zod";
 
@@ -9,6 +9,7 @@ export const branches = pgTable("branches", {
   kecamatan: varchar("kecamatan", { length: 256 }).notNull(),
   city: varchar("city", { length: 256 }).notNull(),
   postalCode: varchar("postal_code", { length: 5 }).notNull(),
+  publishAmount: integer("publish_amount").notNull().default(0),
   headId: serial("head_id")
     .references(() => branchHeads.id)
     .notNull(),

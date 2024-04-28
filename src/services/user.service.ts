@@ -14,8 +14,13 @@ export async function authenticate(username: string, password: string) {
   return rest;
 }
 
-export async function getAllUsers() {
-  return (await db.query.users.findMany()).map((user) => {
+export async function getAllUsers(where: Partial<typeof users.$inferSelect> = {}) {
+  return (
+    await db.query.users.findMany({
+      where: (users, { eq, and }) =>
+        and(...Object.entries(where).map(([key, value]) => eq(users[key as keyof typeof users], value))),
+    })
+  ).map((user) => {
     const { password, ...rest } = user;
     return rest;
   });

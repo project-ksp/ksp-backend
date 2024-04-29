@@ -6,8 +6,9 @@ async function seed() {
     branchHead: await import("./branchHead.seeder"),
     branch: await import("./branch.seeder"),
     user: await import("./user.seeder"),
+    member: await import("./member.seeder"),
   };
-  const deleteOrder: Array<keyof typeof seeders> = ["user", "branch", "branchHead"];
+  const deleteOrder: Array<keyof typeof seeders> = ["member", "user", "branch", "branchHead"];
 
   await initDb();
   for (const name of deleteOrder) {

@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { users } from "@/db/schemas";
 import cipher from "@/utils/cipher";
-import { count, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import * as branchService from "./branch.service";
 
 export async function authenticate(username: string, password: string) {
@@ -81,7 +81,7 @@ async function generateUsername(role: typeof users.$inferInsert.role, branchId: 
         count: count(),
       })
       .from(users)
-      .where(eq(users.role, "branch_head"));
+      .where(and(eq(users.role, "branch_head"), eq(users.branchId, branchId)));
     return `kepcabang.${branchId}.${branchHeadCount[0]!.count + 1}`;
   }
 

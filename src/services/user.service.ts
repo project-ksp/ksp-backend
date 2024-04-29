@@ -76,7 +76,13 @@ async function generateUsername(role: typeof users.$inferInsert.role, branchId: 
   }
 
   if (role === "branch_head") {
-    return `kepcabang.${branchId}`;
+    const branchHeadCount = await db
+      .select({
+        count: count(),
+      })
+      .from(users)
+      .where(eq(users.role, "branch_head"));
+    return `kepcabang.${branchId}.${branchHeadCount[0]!.count + 1}`;
   }
 
   if (role === "teller") {

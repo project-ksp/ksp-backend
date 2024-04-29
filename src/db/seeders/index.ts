@@ -7,8 +7,19 @@ async function seed() {
     branch: await import("./branch.seeder"),
     user: await import("./user.seeder"),
   };
+  const deleteOrder: (keyof typeof seeders)[] = ["user", "branch", "branchHead"];
 
   await initDb();
+  for (const name of deleteOrder) {
+    try {
+      await seeders[name].clear();
+      Logger.info("SEED", `Cleared data for seeder ${name}`);
+    } catch (error) {
+      Logger.error("SEED", `Failed to clear data for seeder ${name}`);
+      throw error;
+    }
+  }
+
   for (const [name, seeder] of Object.entries(seeders)) {
     try {
       await seeder.default();

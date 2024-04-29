@@ -8,9 +8,7 @@ export const users = pgTable("users", {
   password: varchar("password", { length: 256 }).notNull(),
   name: varchar("name", { length: 256 }).notNull(),
   role: roleEnum("role").notNull(),
-  branchId: serial("branch_id")
-    .references(() => branches.id)
-    .notNull(),
+  branchId: serial("branch_id").references(() => branches.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

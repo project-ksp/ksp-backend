@@ -8,3 +8,7 @@ export default async function seed() {
     await db.insert(branchHeads).values(branchHead);
   }
 }
+
+export async function clear() {
+  await db.delete(branchHeads);
+}

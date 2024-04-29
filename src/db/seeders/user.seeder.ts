@@ -1,6 +1,6 @@
-import bcrypt from "bcrypt";
 import { users } from "../schemas";
 import { db } from "..";
+import cipher from "@/utils/cipher";
 
 export default async function seed() {
   const branch = await db.query.branches.findFirst();
@@ -10,7 +10,7 @@ export default async function seed() {
 
   const owner: typeof users.$inferInsert = {
     username: "owner",
-    password: bcrypt.hashSync("owner", 10),
+    password: await cipher.encrypt("owner"),
     name: "Dummy Owner",
     role: "owner",
     branchId: branch.id,
@@ -18,7 +18,7 @@ export default async function seed() {
 
   const teller: typeof users.$inferInsert = {
     username: "teller",
-    password: bcrypt.hashSync("teller", 10),
+    password: await cipher.encrypt("teller"),
     name: "Dummy Teller",
     role: "teller",
     branchId: branch.id,
@@ -26,7 +26,7 @@ export default async function seed() {
 
   const branchHead: typeof users.$inferInsert = {
     username: "kepalacabang",
-    password: bcrypt.hashSync("kepalacabang", 10),
+    password: await cipher.encrypt("kepalacabang"),
     name: "Dummy Branch Head",
     role: "branch_head",
     branchId: branch.id,
@@ -35,4 +35,8 @@ export default async function seed() {
   await db.insert(users).values(owner);
   await db.insert(users).values(teller);
   await db.insert(users).values(branchHead);
+}
+
+export async function clear() {
+  await db.delete(users);
 }

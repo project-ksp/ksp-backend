@@ -1,12 +1,10 @@
 import { db } from "..";
-import membersFactory from "../factories/members.factory";
+import memberFactory from "../factories/member.factory";
 import { members } from "../schemas/members.schema";
 
 export default async function seed() {
-  for (let i = 0; i < 10; i++) {
-    const member = await membersFactory();
-    await db.insert(members).values(member);
-  }
+  const memberData = await Promise.all([...Array(10)].map(async (_) => await memberFactory()));
+  await db.insert(members).values(memberData);
 }
 
 export async function clear() {

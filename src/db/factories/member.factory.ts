@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import type { members } from "../schemas/members.schema";
 import { genderEnum } from "../schemas";
 
-export default async function membersFactory(): Promise<typeof members.$inferInsert> {
+export default async function memberFactory(): Promise<typeof members.$inferInsert> {
   const member = {
     id: `0${faker.number.int({ min: 1, max: 2 })}.${faker.string.numeric(2)}.${faker.string.numeric(2)}.${faker.string.numeric(5)}`,
     name: faker.person.fullName(),

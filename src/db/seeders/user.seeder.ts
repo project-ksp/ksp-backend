@@ -32,9 +32,7 @@ export default async function seed() {
     branchId: branch.id,
   };
 
-  await db.insert(users).values(owner);
-  await db.insert(users).values(teller);
-  await db.insert(users).values(branchHead);
+  await db.insert(users).values([owner, teller, branchHead]);
 }
 
 export async function clear() {

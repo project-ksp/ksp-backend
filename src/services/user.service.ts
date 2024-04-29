@@ -91,7 +91,7 @@ async function generateUsername(role: typeof users.$inferInsert.role, branchId: 
         count: count(),
       })
       .from(users)
-      .where(eq(users.role, "teller"));
+      .where(and(eq(users.role, "teller"), eq(users.branchId, branchId)));
     return `teller.${branchId}.${tellerCount[0]!.count + 1}`;
   }
 

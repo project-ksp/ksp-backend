@@ -17,7 +17,7 @@ export async function authenticate(username: string, password: string) {
 }
 
 export async function getAllUsers(where: Partial<typeof users.$inferSelect> = {}) {
-  return await db.query.users.findMany({
+  return db.query.users.findMany({
     where: (users, { eq, and }) =>
       and(...Object.entries(where).map(([key, value]) => eq(users[key as keyof typeof users], value))),
   });
@@ -60,6 +60,7 @@ export async function generateCSV() {
     const password = await cipher.decrypt(user.password);
     rows += `${user.id},"${user.username}","${password}","${user.name}","${user.role === "branch_head" ? "kepala cabang" : user.role}"\n`;
   }
+
   return rows;
 }
 

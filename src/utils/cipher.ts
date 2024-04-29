@@ -24,6 +24,7 @@ async function decrypt(data: string) {
   if (!ivBase64 || !encrypted) {
     throw new Error("Invalid data");
   }
+
   const iv = Buffer.from(ivBase64, "base64");
   const key = crypto.pbkdf2Sync(env.APP_KEY, iv, 2000, 32, "sha256");
 

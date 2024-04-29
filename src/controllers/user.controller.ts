@@ -20,6 +20,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       message: fromError(validated.error).toString(),
     });
   }
+
   if (validated.data.role !== "owner" && !validated.data.branchId) {
     return reply.status(400).send({
       message: "Branch ID is required for non-owner user",

@@ -4,7 +4,8 @@ import * as branchService from "@/services/branch.service";
 import * as uploadService from "@/services/upload.service";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { branchHeads, branches } from "@/db/schemas";
-import { ZodError } from "zod";
+import { ZodError, z } from "zod";
+import { fromError } from "zod-validation-error";
 
 export async function index(_request: FastifyRequest, reply: FastifyReply) {
   const branches = await branchService.getAllBranches();
@@ -45,17 +46,51 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   }
 
   try {
-    const branchHead = await branchHeadService.createBranchHead(branchHeadData);
-    branchData.headId = branchHead.id;
-
     const branch = await branchService.createBranch(branchData);
+
+    branchHeadData.branchId = branch.id;
+    const branchHead = await branchHeadService.createBranchHead(branchHeadData);
 
     reply.send({
       message: "Branch created successfully",
-      data: {
-        branch,
-        branchHead,
-      },
+      data: { branch, branchHead },
+    });
+  } catch (error) {
+    reply.status(500).send({
+      message: error instanceof Error ? error.message : "Internal server error",
+    });
+  }
+}
+
+export async function updatePublish(request: FastifyRequest, reply: FastifyReply) {
+  const paramValidator = z.object({
+    id: z.string(),
+  });
+  const paramValidated = paramValidator.safeParse(request.params);
+  if (!paramValidated.success) {
+    return reply.status(400).send({
+      message: fromError(paramValidated.error).toString(),
+    });
+  }
+
+  const validator = z.object({
+    publishAmount: z.number(),
+  });
+  const validated = validator.safeParse(request.body);
+  if (!validated.success) {
+    return reply.status(400).send({
+      message: fromError(validated.error).toString(),
+    });
+  }
+
+  try {
+    const branch = await branchService.updateBranch({
+      id: Number.parseInt(paramValidated.data.id, 10),
+      publishAmount: validated.data.publishAmount,
+    });
+    reply.send({
+      message: "Branch updated successfully",
+      data: branch,
     });
   } catch (error) {
     reply.status(500).send({

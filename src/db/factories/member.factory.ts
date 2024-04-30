@@ -11,6 +11,7 @@ export default async function memberFactory(): Promise<typeof members.$inferInse
     totalSaving: faker.number.int({ min: 0, max: 100000000 }),
     totalLoan: faker.number.int({ min: 0, max: 100000000 }),
     leader: faker.person.fullName(),
+    isActive: faker.datatype.boolean(),
   };
 
   return member;

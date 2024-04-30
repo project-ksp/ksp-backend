@@ -1,9 +1,8 @@
 import { faker } from "@faker-js/faker";
 import type { branches } from "../schemas";
-import { db } from "..";
 
 export default async function branchFactory(): Promise<typeof branches.$inferInsert> {
-  const branch = {
+  return {
     address: faker.location.streetAddress(),
     kelurahan: faker.location.buildingNumber(),
     kecamatan: faker.location.cardinalDirection(),
@@ -11,10 +10,4 @@ export default async function branchFactory(): Promise<typeof branches.$inferIns
     postalCode: faker.string.numeric(5),
     publishAmount: faker.number.int(100),
   };
-  const headId = await db.query.branchHeads.findFirst();
-  if (headId) {
-    Object.assign(branch, { headId: headId.id });
-  }
-
-  return branch;
 }

@@ -50,6 +50,20 @@
       "when": 1714397022818,
       "tag": "0006_magical_wendell_rand",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1714459913952,
+      "tag": "0007_strong_veda",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1714462038187,
+      "tag": "0008_cuddly_shocker",
+      "breakpoints": true
     }
   ]
 }

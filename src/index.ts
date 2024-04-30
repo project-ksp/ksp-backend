@@ -2,6 +2,7 @@ import fastify from "fastify";
 import { initDb } from "@/db";
 import { env, Logger, Redis } from "@/utils";
 import { middleware } from "@/modules/middleware";
+import path from "path";
 
 const API_VERSION = "v1";
 
@@ -18,6 +19,8 @@ export const main = async () => {
 
   server.register(import("@fastify/cookie"));
 
+  server.register(import("@fastify/multipart"));
+
   server.register(import("@fastify/cors"), {
     maxAge: 600,
     origin: true,
@@ -33,6 +36,11 @@ export const main = async () => {
     sign: {
       expiresIn: "1d",
     },
+  });
+
+  server.register(import("@fastify/static"), {
+    root: path.join(__dirname, "storage/public"),
+    prefix: "/public/",
   });
 
   server.register(import("@/routes"), {

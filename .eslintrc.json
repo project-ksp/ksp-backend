@@ -10,7 +10,7 @@
       "files": ["*.ts", "*.tsx"],
       "rules": {
         "import/extensions": "off",
-        "@typescript-eslint/quotes": ["error", "double"],
+        "@typescript-eslint/quotes": ["error", "double", { "avoidEscape": true }],
         "@typescript-eslint/indent": ["error", 2],
         "@typescript-eslint/object-curly-spacing": ["error", "always"],
         "n/prefer-global/process": "off",

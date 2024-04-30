@@ -3,7 +3,7 @@ import { db } from "..";
 import branchFactory from "../factories/branch.factory";
 
 export default async function seed() {
-  const branchData = await Promise.all([...Array(10)].map(async (_) => await branchFactory()));
+  const branchData = await Promise.all(Array.from({ length: 10 }, branchFactory));
   await db.insert(branches).values(branchData);
 }
 

@@ -12,8 +12,8 @@ declare module "fastify" {
 
   interface FastifyInstance extends FastifyJwtNamespace<> {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-    authorize: (options: {
-      roles: Array<typeof users.$inferSelect.role>;
-    }) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    authorize: (
+      options: Array<typeof users.$inferSelect.role>,
+    ) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 }

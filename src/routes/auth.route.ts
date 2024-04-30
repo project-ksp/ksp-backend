@@ -6,7 +6,7 @@ const authRoutes = async (fastify: FastifyInstance) => {
   fastify.get("/me", { preHandler: [fastify.authenticate] }, authController.getAuthUserData);
   fastify.post(
     "/access-branch",
-    { preHandler: [fastify.authorize({ roles: ["owner"] })] },
+    { preHandler: [fastify.authorize(["owner"])] },
     authController.authenticateAsBranchHead,
   );
 };

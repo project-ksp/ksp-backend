@@ -85,7 +85,7 @@ export async function updatePublish(request: FastifyRequest, reply: FastifyReply
 
   try {
     const branch = await branchService.updateBranch({
-      id: Number.parseInt(paramValidated.data.id),
+      id: Number.parseInt(paramValidated.data.id, 10),
       publishAmount: validated.data.publishAmount,
     });
     reply.send({

@@ -1,10 +1,9 @@
 import { faker } from "@faker-js/faker";
 import { educationEnum, genderEnum, religionEnum } from "../schemas";
 import type { branchHeads } from "../schemas";
-import { db } from "..";
 
 export default async function branchHeadFactory(): Promise<typeof branchHeads.$inferInsert> {
-  const branchHead = {
+  return {
     name: faker.person.fullName(),
     birthPlace: faker.location.city(),
     birthDate: faker.date.past().toISOString().split("T")[0]!,
@@ -22,14 +21,4 @@ export default async function branchHeadFactory(): Promise<typeof branchHeads.$i
     profilePictureUrl: "placeholder.png",
     idPictureUrl: "placeholder.png",
   };
-
-  const branch = await db.query.branches.findFirst({
-    columns: {
-      id: true,
-    },
-  });
-  if (branch) {
-    Object.assign(branchHead, { branchId: branch.id });
-  }
-  return branchHead;
 }

@@ -2,6 +2,7 @@ import { pgTable, serial, timestamp, varchar, text, boolean, date } from "drizzl
 import { educationEnum, genderEnum, religionEnum } from "./enums.schema";
 import { createInsertSchema } from "drizzle-zod";
 import { branches } from "./branches.schema";
+import { relations } from "drizzle-orm";
 
 export const branchHeads = pgTable("branch_heads", {
   id: serial("id").primaryKey(),
@@ -27,5 +28,12 @@ export const branchHeads = pgTable("branch_heads", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const branchHeadsRelations = relations(branchHeads, ({ one }) => ({
+  branch: one(branches, {
+    fields: [branchHeads.branchId],
+    references: [branches.id],
+  }),
+}));
 
 export const insertBranchHeadSchema = createInsertSchema(branchHeads);

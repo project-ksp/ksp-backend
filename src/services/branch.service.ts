@@ -2,8 +2,16 @@ import { db } from "@/db";
 import { branches } from "@/db/schemas";
 
 export async function getAllBranches() {
-  const branches = await db.query.branches.findMany();
-  return branches;
+  return db.query.branches.findMany({
+    with: {
+      branchHeads: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
 }
 
 export async function createBranch(data: typeof branches.$inferInsert) {

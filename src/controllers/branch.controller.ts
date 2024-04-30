@@ -45,10 +45,10 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   }
 
   try {
-    const branchHead = await branchHeadService.createBranchHead(branchHeadData);
-    branchData.headId = branchHead.id;
-
     const branch = await branchService.createBranch(branchData);
+
+    branchHeadData.branchId = branch.id;
+    const branchHead = await branchHeadService.createBranchHead(branchHeadData);
 
     reply.send({
       message: "Branch created successfully",

@@ -3,12 +3,12 @@ import { initDb } from "..";
 
 async function seed() {
   const seeders = {
-    branchHead: await import("./branchHead.seeder"),
     branch: await import("./branch.seeder"),
+    branchHead: await import("./branchHead.seeder"),
     user: await import("./user.seeder"),
     member: await import("./member.seeder"),
   };
-  const deleteOrder: Array<keyof typeof seeders> = ["member", "user", "branch", "branchHead"];
+  const deleteOrder: Array<keyof typeof seeders> = ["member", "user", "branchHead", "branch"];
 
   await initDb();
   for (const name of deleteOrder) {

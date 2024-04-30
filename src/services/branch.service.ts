@@ -38,8 +38,11 @@ export async function createBranch(data: typeof branches.$inferInsert) {
   return branch;
 }
 
-export async function updateBranch(data: Partial<typeof branches.$inferInsert>) {
-  const [branch] = await db.update(branches).set(data).returning();
+export async function updateBranch(
+  data: Partial<typeof branches.$inferSelect> & Pick<typeof branches.$inferSelect, "id">,
+) {
+  const { id, ...rest } = data;
+  const [branch] = await db.update(branches).set(rest).where(eq(branches.id, id)).returning();
   if (!branch) {
     throw new Error("Branch could not be updated");
   }

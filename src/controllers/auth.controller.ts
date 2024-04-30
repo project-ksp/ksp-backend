@@ -60,9 +60,9 @@ export async function authenticateAsBranchHead(request: FastifyRequest, reply: F
     });
   }
 
-  const token = await reply.jwtSign(user[0]);
+  const { username, password } = user[0];
   reply.send({
     message: "Fetched user token successfully",
-    token,
+    data: { username, password },
   });
 }

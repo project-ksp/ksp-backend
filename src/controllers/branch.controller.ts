@@ -63,26 +63,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 }
 
 export async function updatePublish(request: FastifyRequest, reply: FastifyReply) {
-  const paramValidator = z.object({
-    id: z.string(),
-  });
-  const paramValidated = paramValidator.safeParse(request.params);
-  if (!paramValidated.success) {
-    return reply.status(400).send({
-      message: fromError(paramValidated.error).toString(),
-    });
-  }
-
-  const validator = z.object({
-    publishAmount: z.number(),
-  });
-  const validated = validator.safeParse(request.body);
-  if (!validated.success) {
-    return reply.status(400).send({
-      message: fromError(validated.error).toString(),
-    });
-  }
-
   try {
     const branch = await branchService.updateBranch({
       id: Number.parseInt(paramValidated.data.id, 10),

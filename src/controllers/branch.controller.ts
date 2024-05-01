@@ -2,10 +2,10 @@ import { insertBranchHeadSchema, insertBranchSchema } from "@/db/schemas";
 import * as branchHeadService from "@/services/branchHead.service";
 import * as branchService from "@/services/branch.service";
 import * as uploadService from "@/services/upload.service";
+import { ZodError } from "zod";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { branchHeads, branches } from "@/db/schemas";
-import { ZodError, z } from "zod";
-import { fromError } from "zod-validation-error";
+import type { UpdatePublishSchema } from "@/schemas/branch.schema";
 
 export async function index(_request: FastifyRequest, reply: FastifyReply) {
   const branches = await branchService.getAllBranches();
@@ -62,12 +62,12 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
   }
 }
 
-export async function updatePublish(request: FastifyRequest, reply: FastifyReply) {
+export async function updatePublish(request: FastifyRequest<UpdatePublishSchema>, reply: FastifyReply) {
+  const { id } = request.query;
+  const { publishAmount } = request.body;
+
   try {
-    const branch = await branchService.updateBranch({
-      id: Number.parseInt(paramValidated.data.id, 10),
-      publishAmount: validated.data.publishAmount,
-    });
+    const branch = await branchService.updateBranch({ id, publishAmount });
     reply.send({
       message: "Branch updated successfully",
       data: branch,

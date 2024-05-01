@@ -1,22 +1,20 @@
-import { FromSchema } from "json-schema-to-ts";
+import type SchemaToRequestTypes from ".";
 
 export const updatePublishSchema = {
-  query: {
+  querystring: {
     type: "object",
+    required: ["id"],
     properties: {
       id: { type: "number" },
     },
   } as const,
   body: {
     type: "object",
-    required: ["publish"],
+    required: ["publishAmount"],
     properties: {
       publishAmount: { type: "number" },
     },
   } as const,
 };
 
-export type UpdatePublishSchema = {
-  query: FromSchema<typeof updatePublishSchema.query>;
-  body: FromSchema<typeof updatePublishSchema.body>;
-};
+export type UpdatePublishSchema = SchemaToRequestTypes<typeof updatePublishSchema>;

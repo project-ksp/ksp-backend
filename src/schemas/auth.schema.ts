@@ -1,4 +1,4 @@
-import type { FromSchema } from "json-schema-to-ts";
+import type SchemaToRequestTypes from ".";
 
 export const loginSchema = {
   body: {
@@ -21,5 +21,5 @@ export const accessBranchSchema = {
   } as const,
 };
 
-export type loginBodySchema = FromSchema<typeof loginSchema.body>;
-export type accessBranchBodySchema = FromSchema<typeof accessBranchSchema.body>;
+export type LoginSchema = SchemaToRequestTypes<typeof loginSchema>;
+export type AccessBranchSchema = SchemaToRequestTypes<typeof accessBranchSchema>;

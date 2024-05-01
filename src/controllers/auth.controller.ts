@@ -1,11 +1,10 @@
-import type { loginBodySchema } from "@/schemas/auth.schema";
+import type { LoginSchema } from "@/schemas/auth.schema";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import * as userService from "@/services/user.service";
 import { z } from "zod";
 import { fromError } from "zod-validation-error";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export async function authenticate(request: FastifyRequest<{ Body: loginBodySchema }>, reply: FastifyReply) {
+export async function authenticate(request: FastifyRequest<LoginSchema>, reply: FastifyReply) {
   const { username, password } = request.body;
 
   try {

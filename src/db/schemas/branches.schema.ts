@@ -3,6 +3,7 @@ import { pgTable, serial, timestamp, varchar, text, integer } from "drizzle-orm/
 import { createInsertSchema } from "drizzle-zod";
 import { branchHeads } from "./branchHeads.schema";
 import { members } from "./members.schema";
+import { buildJsonSchemas } from "fastify-zod";
 
 export const branches = pgTable("branches", {
   id: serial("id").primaryKey(),
@@ -22,3 +23,4 @@ export const branchesRelations = relations(branches, ({ many }) => ({
 }));
 
 export const insertBranchSchema = createInsertSchema(branches);
+export const { schemas: branchesSchema, $ref } = buildJsonSchemas({ insertBranchSchema });

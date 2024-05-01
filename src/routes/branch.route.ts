@@ -1,5 +1,5 @@
 import * as branchController from "@/controllers/branch.controller";
-import { updatePublishSchema } from "@/schemas/branch.schema";
+import { updateBranchPublishSchema } from "@/schemas/branch.schema";
 import type { FastifyInstance } from "fastify";
 
 const authRoutes = async (fastify: FastifyInstance) => {
@@ -8,7 +8,7 @@ const authRoutes = async (fastify: FastifyInstance) => {
   fastify.put(
     "/:id/publish",
     {
-      schema: updatePublishSchema,
+      schema: updateBranchPublishSchema,
       preHandler: [fastify.authorize(["owner"])],
     },
     branchController.updatePublish,

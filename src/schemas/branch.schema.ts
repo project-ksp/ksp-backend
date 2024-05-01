@@ -1,6 +1,11 @@
+import { insertBranchSchema } from "@/db/schemas";
 import type SchemaToRequestTypes from ".";
 
-export const updatePublishSchema = {
+export const createBranchSchema = {
+  body: insertBranchSchema,
+};
+
+export const updateBranchPublishSchema = {
   querystring: {
     type: "object",
     required: ["id"],
@@ -17,4 +22,4 @@ export const updatePublishSchema = {
   } as const,
 };
 
-export type UpdatePublishSchema = SchemaToRequestTypes<typeof updatePublishSchema>;
+export type UpdatePublishSchema = SchemaToRequestTypes<typeof updateBranchPublishSchema>;

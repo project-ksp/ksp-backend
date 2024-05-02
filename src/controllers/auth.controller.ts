@@ -1,11 +1,8 @@
-import type { loginRequestType } from "@/schemas/user.schema";
+import type { AccessBranchSchema, LoginSchema } from "@/schemas/auth.schema";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import * as userService from "@/services/user.service";
-import { z } from "zod";
-import { fromError } from "zod-validation-error";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export async function authenticate(request: FastifyRequest<{ Body: loginRequestType }>, reply: FastifyReply) {
+export async function authenticate(request: FastifyRequest<LoginSchema>, reply: FastifyReply) {
   const { username, password } = request.body;
 
   try {
@@ -41,19 +38,10 @@ export async function getAuthUserData(request: FastifyRequest, reply: FastifyRep
   });
 }
 
-export async function authenticateAsBranchHead(request: FastifyRequest, reply: FastifyReply) {
-  const validator = z.object({
-    branchId: z.number(),
-  });
+export async function authenticateAsBranchHead(request: FastifyRequest<AccessBranchSchema>, reply: FastifyReply) {
+  const { branchId } = request.body;
+  const user = await userService.getAllUsers({ role: "branch_head", branchId });
 
-  const validated = validator.safeParse(request.body);
-  if (!validated.success) {
-    return reply.status(400).send({
-      message: fromError(validated.error).toString(),
-    });
-  }
-
-  const user = await userService.getAllUsers({ role: "branch_head", branchId: validated.data.branchId });
   if (!user[0]) {
     return reply.status(400).send({
       message: "Branch account not found.",

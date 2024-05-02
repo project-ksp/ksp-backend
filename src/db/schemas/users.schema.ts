@@ -1,6 +1,7 @@
 import { pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
 import { roleEnum } from "./enums.schema";
 import { branches } from "./branches.schema";
+import { createInsertSchema } from "drizzle-zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -12,3 +13,13 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const userInsertSchema = createInsertSchema(users)
+  .strict()
+  .omit({
+    username: true,
+    password: true,
+  })
+  .refine((input) => input.role === "owner" || input.branchId, {
+    message: "Branch ID is required for non-owner users.",
+  });

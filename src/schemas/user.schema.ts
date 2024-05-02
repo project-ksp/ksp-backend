@@ -1,8 +1,10 @@
-import { z } from "zod";
+import type SchemaToRequestTypes from ".";
 
-const loginRequestSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-});
+export const createUserSchema = {
+  body: {
+    type: "object",
+    properties: {},
+  } as const,
+};
 
-export type loginRequestType = z.infer<typeof loginRequestSchema>;
+export type CreateUserSchema = SchemaToRequestTypes<typeof createUserSchema>;

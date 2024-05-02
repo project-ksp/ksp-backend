@@ -20,7 +20,7 @@ const middleware = fp(async (fastify: FastifyInstance, _options: unknown) => {
   fastify.decorate("authorize", (options) => async (request, reply) => {
     try {
       await request.jwtVerify();
-      if (!options?.roles?.includes(request.user.role)) {
+      if (!options?.includes(request.user.role)) {
         throw new Error("Unauthorized");
       }
     } catch (error) {

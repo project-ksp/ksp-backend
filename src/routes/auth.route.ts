@@ -1,12 +1,16 @@
 import * as authController from "@/controllers/auth.controller";
+import { accessBranchSchema, loginSchema } from "@/schemas/auth.schema";
 import type { FastifyInstance } from "fastify";
 
 const authRoutes = async (fastify: FastifyInstance) => {
-  fastify.post("/login", authController.authenticate);
+  fastify.post("/login", { schema: loginSchema }, authController.authenticate);
   fastify.get("/me", { preHandler: [fastify.authenticate] }, authController.getAuthUserData);
   fastify.post(
     "/access-branch",
-    { preHandler: [fastify.authorize({ roles: ["owner"] })] },
+    {
+      schema: accessBranchSchema,
+      preHandler: [fastify.authorize(["owner"])],
+    },
     authController.authenticateAsBranchHead,
   );
 };

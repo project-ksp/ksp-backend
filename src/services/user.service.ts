@@ -1,8 +1,9 @@
 import { db } from "@/db";
-import { users } from "@/db/schemas";
+import { type userInsertSchema, users } from "@/db/schemas";
 import cipher from "@/utils/cipher";
 import { and, count, eq } from "drizzle-orm";
 import * as branchService from "./branch.service";
+import type { z } from "zod";
 
 export async function authenticate(username: string, password: string) {
   const user = await db.query.users.findFirst({
@@ -35,7 +36,7 @@ export async function getUserByID(id: number) {
   return rest;
 }
 
-export async function createUser(data: Omit<typeof users.$inferInsert, "username" | "password">) {
+export async function createUser(data: z.infer<typeof userInsertSchema>) {
   const username = await generateUsername(data.role, data.branchId ?? 0);
   const password = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
 

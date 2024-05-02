@@ -59,7 +59,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 }
 
 export async function updatePublish(request: FastifyRequest<UpdatePublishSchema>, reply: FastifyReply) {
-  const { id } = request.query;
+  const { id } = request.params;
   const { publishAmount } = request.body;
 
   try {

@@ -9,4 +9,15 @@ export const indexMemberSchema = {
   } as const,
 };
 
+export const searchMemberSchema = {
+  querystring: {
+    type: "object",
+    required: ["query"],
+    properties: {
+      query: { type: "string" },
+    },
+  } as const,
+};
+
 export type IndexMemberSchema = SchemaToRequestTypes<typeof indexMemberSchema>;
+export type SearchMemberSchema = SchemaToRequestTypes<typeof searchMemberSchema>;

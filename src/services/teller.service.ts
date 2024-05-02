@@ -21,7 +21,12 @@ export async function getAllTellers({ where = {} }: { where?: Partial<typeof tel
 }
 
 export async function getTellerById(id: number, branchId: number) {
-  return db.query.tellers.findFirst({ where: and(eq(tellers.id, id), eq(tellers.branchId, branchId)) });
+  return db.query.tellers.findFirst({
+    where: and(eq(tellers.id, id), eq(tellers.branchId, branchId)),
+    extras: {
+      age: sql<number>`DATE_PART('YEAR', AGE(${tellers.birthDate}))`.as("age"),
+    },
+  });
 }
 
 export async function createTeller(data: typeof tellers.$inferInsert) {

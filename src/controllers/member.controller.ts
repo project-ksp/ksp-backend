@@ -28,7 +28,7 @@ export async function indexRecap(request: FastifyRequest, reply: FastifyReply) {
   }
 
   const data = await memberService.getAllMembers({
-    where: { branchId: request.user.branchId },
+    where: { branchId: request.user.branchId, isActive: true },
     limit: branch.publishAmount,
   });
 

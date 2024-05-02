@@ -1,4 +1,4 @@
-import SchemaToRequestTypes from ".";
+import type SchemaToRequestTypes from ".";
 
 export const createUserSchema = {
   body: {

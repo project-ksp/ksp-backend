@@ -2,10 +2,10 @@ import { insertBranchHeadSchema, insertBranchSchema } from "@/db/schemas";
 import * as branchHeadService from "@/services/branchHead.service";
 import * as branchService from "@/services/branch.service";
 import * as uploadService from "@/services/upload.service";
-import { ZodError } from "zod";
+import { z } from "zod";
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { branchHeads, branches } from "@/db/schemas";
 import type { UpdatePublishSchema } from "@/schemas/branch.schema";
+import { fromError } from "zod-validation-error";
 
 export async function index(_request: FastifyRequest, reply: FastifyReply) {
   const branches = await branchService.getAllBranches();
@@ -16,22 +16,18 @@ export async function index(_request: FastifyRequest, reply: FastifyReply) {
 }
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {
-  const data = request.body as {
-    branch: any;
-    branchHead: any;
-  };
-
-  let branchData: typeof branches.$inferInsert;
-  let branchHeadData: typeof branchHeads.$inferInsert;
-
-  try {
-    branchData = insertBranchSchema.parse(data.branch) as typeof branchData;
-    branchHeadData = insertBranchHeadSchema.parse(data.branchHead) as typeof branchHeadData;
-  } catch (error) {
+  const validator = z.object({
+    branch: insertBranchSchema,
+    branchHead: insertBranchHeadSchema,
+  });
+  const validated = validator.safeParse(request.body);
+  if (!validated.success) {
     return reply.status(400).send({
-      message: error instanceof ZodError ? error.issues : "Invalid data",
+      message: fromError(validated.error).toString(),
     });
   }
+
+  const { branch: branchData, branchHead: branchHeadData } = validated.data;
 
   if (!uploadService.isTemporaryFileExists(branchHeadData.profilePictureUrl)) {
     return reply.status(400).send({

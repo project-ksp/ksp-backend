@@ -47,6 +47,7 @@
     "drizzle-zod": "^0.5.1",
     "fastify": "^4.25.0",
     "fastify-plugin": "^4.5.1",
+    "fastify-zod": "^1.4.0",
     "mime-types": "^2.1.35",
     "pg": "^8.11.3",
     "redis": "^4.6.11",

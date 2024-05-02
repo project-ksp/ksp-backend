@@ -1,4 +1,4 @@
-import { RouteGenericInterface } from "fastify";
+import type { RouteGenericInterface } from "fastify";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 
 type CapitalizeFirstLetter<S extends string> = S extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : S;

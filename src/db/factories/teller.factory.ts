@@ -6,7 +6,7 @@ export default async function tellerFactory(): Promise<typeof tellers.$inferInse
   return {
     name: faker.person.fullName(),
     birthPlace: faker.location.city(),
-    birthDate: faker.date.past().toISOString().split("T")[0]!,
+    birthDate: faker.date.birthdate().toISOString().split("T")[0]!,
     gender: genderEnum.enumValues[faker.number.int(genderEnum.enumValues.length)] ?? "laki-laki",
     nik: faker.string.numeric(16),
     religion: religionEnum.enumValues[faker.number.int(religionEnum.enumValues.length)] ?? "islam",

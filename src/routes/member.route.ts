@@ -4,6 +4,7 @@ import type { FastifyInstance } from "fastify";
 
 const memberRoutes = async (fastify: FastifyInstance) => {
   fastify.get("/", { schema: indexMemberSchema, preHandler: [fastify.authenticate] }, memberController.index);
+  fastify.get("/recap", { preHandler: [fastify.authorize(["branch_head", "teller"])] }, memberController.indexRecap);
   fastify.get(
     "/search",
     { schema: searchMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },

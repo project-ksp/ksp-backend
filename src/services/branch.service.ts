@@ -29,6 +29,10 @@ export async function getAllBranches() {
     .leftJoin(branchHeads, eq(branches.id, branchHeads.branchId));
 }
 
+export async function getBranchById(id: number) {
+  return db.query.branches.findFirst({ where: eq(branches.id, id) });
+}
+
 export async function createBranch(data: typeof branches.$inferInsert) {
   const [branch] = await db.insert(branches).values(data).returning();
   if (!branch) {

@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
+import type { ShowTellerSchema, UpdateTellerSchema } from "@/schemas/teller.schema";
 import * as tellerService from "@/services/teller.service";
-import { ShowTellerSchema, UpdateTellerSchema } from "@/schemas/teller.schema";
 import { insertTellerSchema, updateTellerSchema } from "@/db/schemas";
 import { fromError } from "zod-validation-error";
 

@@ -13,6 +13,7 @@ export default async function seed() {
       Object.assign(tellerData[i * batch + j]!, { branchId: branches[i]!.id });
     }
   }
+
   await db.insert(tellers).values(tellerData);
 }
 

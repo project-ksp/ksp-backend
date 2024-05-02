@@ -16,8 +16,15 @@ export async function index(request: FastifyRequest, reply: FastifyReply) {
 
   const { page } = validated.data;
 
-  reply.send({
-    message: "Members successfully fetched.",
-    data: await memberService.getAllMembers(page),
-  });
+  try {
+    const data = await memberService.getAllMembers(page);
+    reply.send({
+      message: "Members successfully fetched.",
+      data,
+    });
+  } catch (error) {
+    return reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
 }

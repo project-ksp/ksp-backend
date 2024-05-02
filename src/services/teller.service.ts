@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { tellers } from "@/db/schemas";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 export async function getAllTellers({ where = {} }: { where?: Partial<typeof tellers.$inferSelect> }) {
   return db.query.tellers.findMany({
@@ -20,8 +20,8 @@ export async function getAllTellers({ where = {} }: { where?: Partial<typeof tel
   });
 }
 
-export async function getTellerById(id: number) {
-  return db.query.tellers.findFirst({ where: eq(tellers.id, id) });
+export async function getTellerById(id: number, branchId: number) {
+  return db.query.tellers.findFirst({ where: and(eq(tellers.id, id), eq(tellers.branchId, branchId)) });
 }
 
 export async function createTeller(data: typeof tellers.$inferInsert) {

@@ -39,9 +39,17 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 
 export async function show(request: FastifyRequest<ShowTellerSchema>, reply: FastifyReply) {
   const { id } = request.params;
+  const teller = await tellerService.getTellerById(id, request.user.branchId);
+
+  if (!teller) {
+    return reply.status(404).send({
+      message: "Teller not found",
+    });
+  }
+
   reply.send({
     message: "Teller successfully fetched",
-    data: await tellerService.getTellerById(id),
+    data: teller,
   });
 }
 

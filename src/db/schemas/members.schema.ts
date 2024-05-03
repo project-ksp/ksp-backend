@@ -9,7 +9,6 @@ export const members = pgTable("members", {
   name: varchar("name", { length: 256 }).notNull(),
   nik: varchar("nik", { length: 16 }).unique().notNull(),
   gender: genderEnum("gender").notNull(),
-  leader: varchar("leader", { length: 256 }).notNull(),
   totalSaving: bigint("total_saving", { mode: "number" }).notNull().default(0),
   totalLoan: bigint("total_loan", { mode: "number" }).notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),

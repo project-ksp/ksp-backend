@@ -23,6 +23,14 @@ export async function getAllMembers({
         ),
       ),
     limit,
+    with: {
+      leader: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   });
 }
 
@@ -37,6 +45,14 @@ export async function getAllMembersWithPagination(page = 1) {
   const data = await db.query.members.findMany({
     limit: 10,
     offset: (page - 1) * 10,
+    with: {
+      leader: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   });
 
   return {

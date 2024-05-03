@@ -10,7 +10,6 @@ export default async function memberFactory(): Promise<typeof members.$inferInse
     gender: genderEnum.enumValues[faker.number.int(genderEnum.enumValues.length)] ?? "laki-laki",
     totalSaving: faker.number.int({ min: 0, max: 100000000 }),
     totalLoan: faker.number.int({ min: 0, max: 100000000 }),
-    leader: faker.person.fullName(),
     isActive: faker.datatype.boolean(),
   };
 

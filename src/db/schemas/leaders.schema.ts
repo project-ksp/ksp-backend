@@ -4,6 +4,7 @@ import { branches } from "./branches.schema";
 import { createInsertSchema } from "drizzle-zod";
 import * as uploadService from "@/services/upload.service";
 import { relations } from "drizzle-orm";
+import { members } from "./members.schema";
 
 export const leaders = pgTable("leaders", {
   id: serial("id").primaryKey(),
@@ -33,7 +34,7 @@ export const leadersRelations = relations(leaders, ({ one, many }) => ({
     fields: [leaders.branchId],
     references: [branches.id],
   }),
-  members: many(leaders),
+  members: many(members),
 }));
 
 export const insertLeaderSchema = createInsertSchema(leaders)

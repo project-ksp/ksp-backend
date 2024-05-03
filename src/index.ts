@@ -40,7 +40,7 @@ export const main = async () => {
 
   server.register(import("@fastify/static"), {
     root: path.join(__dirname, "storage/public"),
-    prefix: "/public/",
+    prefix: `/${API_VERSION}/public/`,
   });
 
   server.register(import("@/routes"), {

@@ -1,33 +1,45 @@
 import { db } from "@/db";
-import { leaders, updateLeaderSchema } from "@/db/schemas";
-import { and, eq, sql } from "drizzle-orm";
+import { leaders, members, updateLeaderSchema } from "@/db/schemas";
+import { and, count, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export async function getAllLeaders({ where = {} }: { where?: Partial<typeof leaders.$inferSelect> }) {
-  return db.query.leaders.findMany({
-    columns: {
-      id: true,
-      name: true,
-      nik: true,
-      gender: true,
-      city: true,
-      phoneNumber: true,
-    },
-    where: (leaders, { eq, and }) =>
-      and(...Object.entries(where).map(([key, value]) => eq(leaders[key as keyof typeof leaders], value))),
-    extras: {
+  return db
+    .select({
+      id: leaders.id,
+      name: leaders.name,
+      nik: leaders.nik,
+      gender: leaders.gender,
+      city: leaders.city,
+      phoneNumber: leaders.phoneNumber,
       age: sql<number>`DATE_PART('YEAR', AGE(${leaders.birthDate}))`.as("age"),
-    },
-  });
+      memberCount: count(members.id),
+    })
+    .from(leaders)
+    .where(and(...Object.entries(where).map(([key, value]) => eq(leaders[key as keyof typeof where], value))))
+    .leftJoin(members, eq(leaders.id, members.leaderId))
+    .groupBy(leaders.id);
 }
 
 export async function getLeaderById(id: number, branchId: number) {
-  return db.query.leaders.findFirst({
+  const data = await db.query.leaders.findFirst({
     where: and(eq(leaders.id, id), eq(leaders.branchId, branchId)),
     extras: {
       age: sql<number>`DATE_PART('YEAR', AGE(${leaders.birthDate}))`.as("age"),
     },
+    with: {
+      members: {
+        columns: {
+          id: true,
+        },
+      },
+    },
   });
+  if (data) {
+    Object.assign(data, { memberCount: data.members.length });
+    Object.assign(data, { members: undefined });
+  }
+  return data;
 }
 
 export async function createLeader(data: typeof leaders.$inferInsert) {

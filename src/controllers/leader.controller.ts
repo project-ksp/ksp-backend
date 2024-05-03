@@ -5,11 +5,13 @@ import { insertLeaderSchema, updateLeaderSchema } from "@/db/schemas";
 import { fromError } from "zod-validation-error";
 
 export async function index(request: FastifyRequest, reply: FastifyReply) {
+  const data = await leaderService.getAllLeaders({
+    where: { branchId: request.user.branchId },
+  });
+
   reply.send({
     message: "Leaders successfully fetched",
-    data: await leaderService.getAllLeaders({
-      where: { branchId: request.user.branchId },
-    }),
+    data,
   });
 }
 

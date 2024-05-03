@@ -3,7 +3,7 @@ import { db } from "..";
 import tellerFactory from "../factories/teller.factory";
 
 export default async function seed() {
-  const tellerData = await Promise.all(Array.from({ length: 100 }, tellerFactory));
+  const tellerData = await Promise.all(Array.from({ length: 500 }, tellerFactory));
   const branches = await db.query.branches.findMany();
 
   const batch = Math.floor(tellerData.length / branches.length);

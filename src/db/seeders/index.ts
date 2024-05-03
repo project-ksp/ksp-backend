@@ -6,10 +6,11 @@ async function seed() {
     branch: await import("./branch.seeder"),
     branchHead: await import("./branchHead.seeder"),
     user: await import("./user.seeder"),
+    leader: await import("./leader.seeder"),
     member: await import("./member.seeder"),
     teller: await import("./teller.seeder"),
   };
-  const deleteOrder: Array<keyof typeof seeders> = ["teller", "member", "user", "branchHead", "branch"];
+  const deleteOrder: Array<keyof typeof seeders> = ["teller", "member", "leader", "user", "branchHead", "branch"];
 
   await initDb();
   for (const name of deleteOrder) {
@@ -20,6 +21,10 @@ async function seed() {
       Logger.error("SEED", `Failed to clear data for seeder ${name}`);
       throw error;
     }
+  }
+
+  if (process.argv.includes("--clear")) {
+    return;
   }
 
   for (const [name, seeder] of Object.entries(seeders)) {

@@ -3,6 +3,7 @@ import { educationEnum, genderEnum, religionEnum } from "./enums.schema";
 import { branches } from "./branches.schema";
 import { createInsertSchema } from "drizzle-zod";
 import * as uploadService from "@/services/upload.service";
+import { relations } from "drizzle-orm";
 
 export const tellers = pgTable("tellers", {
   id: serial("id").primaryKey(),
@@ -27,16 +28,30 @@ export const tellers = pgTable("tellers", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const insertTellerSchema = createInsertSchema(tellers).refine(
-  (input) =>
-    uploadService.isTemporaryFileExists(input.profilePictureUrl) &&
-    uploadService.isTemporaryFileExists(input.idPictureUrl),
-  {
-    message: "Profile picture or ID picture is not uploaded yet.",
-  },
-);
+export const tellersRelations = relations(tellers, ({ one }) => ({
+  branch: one(branches, {
+    fields: [tellers.branchId],
+    references: [branches.id],
+  }),
+}));
+
+export const insertTellerSchema = createInsertSchema(tellers)
+  .omit({
+    createdAt: true,
+    updatedAt: true,
+  })
+  .refine(
+    (input) =>
+      uploadService.isTemporaryFileExists(input.profilePictureUrl) &&
+      uploadService.isTemporaryFileExists(input.idPictureUrl),
+    {
+      message: "Profile picture or ID picture is not uploaded yet.",
+    },
+  );
 
 export const updateTellerSchema = createInsertSchema(tellers).omit({
   profilePictureUrl: true,
   idPictureUrl: true,
+  createdAt: true,
+  updatedAt: true,
 });

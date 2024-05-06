@@ -10,7 +10,6 @@ export default async function leaderFactory(): Promise<typeof leaders.$inferInse
     gender: genderEnum.enumValues[faker.number.int(genderEnum.enumValues.length)] ?? "laki-laki",
     nik: faker.string.numeric(16),
     religion: religionEnum.enumValues[faker.number.int(religionEnum.enumValues.length)] ?? "islam",
-    occupation: faker.person.jobTitle(),
     address: faker.location.streetAddress(),
     kelurahan: faker.location.buildingNumber(),
     kecamatan: faker.location.cardinalDirection(),

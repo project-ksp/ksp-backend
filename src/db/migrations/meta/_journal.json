@@ -85,6 +85,13 @@
       "when": 1714729712966,
       "tag": "0011_chemical_wither",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1714984570355,
+      "tag": "0012_jazzy_speed",
+      "breakpoints": true
     }
   ]
 }

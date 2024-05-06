@@ -13,7 +13,6 @@ export const tellers = pgTable("tellers", {
   gender: genderEnum("gender").notNull(),
   nik: varchar("nik", { length: 16 }).notNull(),
   religion: religionEnum("religion").notNull(),
-  occupation: varchar("occupation", { length: 256 }).notNull(),
   address: text("address").notNull(),
   kelurahan: varchar("kelurahan", { length: 256 }).notNull(),
   kecamatan: varchar("kecamatan", { length: 256 }).notNull(),

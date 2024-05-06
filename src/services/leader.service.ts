@@ -1,7 +1,7 @@
 import { db } from "@/db";
-import { leaders, members, updateLeaderSchema } from "@/db/schemas";
+import { leaders, members, type updateLeaderSchema } from "@/db/schemas";
 import { and, count, eq, sql } from "drizzle-orm";
-import { z } from "zod";
+import type { z } from "zod";
 
 export async function getAllLeaders({ where = {} }: { where?: Partial<typeof leaders.$inferSelect> }) {
   return db
@@ -39,6 +39,7 @@ export async function getLeaderById(id: number, branchId: number) {
     Object.assign(data, { memberCount: data.members.length });
     Object.assign(data, { members: undefined });
   }
+
   return data;
 }
 

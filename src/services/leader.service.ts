@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { leaders, members, type updateLeaderSchema } from "@/db/schemas";
 import { and, count, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
+import * as uploadService from "@/services/upload.service";
 
 export async function getAllLeaders({ where = {} }: { where?: Partial<typeof leaders.$inferSelect> }) {
   return db
@@ -44,6 +45,12 @@ export async function getLeaderById(id: number, branchId: number) {
 }
 
 export async function createLeader(data: typeof leaders.$inferInsert) {
+  const profilePictureUrl = uploadService.persistTemporaryFile(data.profilePictureUrl);
+  const idPictureUrl = uploadService.persistTemporaryFile(data.idPictureUrl);
+
+  data.profilePictureUrl = profilePictureUrl;
+  data.idPictureUrl = idPictureUrl;
+
   const [leader] = await db.insert(leaders).values(data).returning();
   if (!leader) {
     throw new Error("Failed to create Leader");

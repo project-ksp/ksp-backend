@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { tellers } from "@/db/schemas";
 import { and, eq, sql } from "drizzle-orm";
+import * as uploadService from "@/services/upload.service";
 
 export async function getAllTellers({ where = {} }: { where?: Partial<typeof tellers.$inferSelect> }) {
   return db.query.tellers.findMany({
@@ -30,6 +31,12 @@ export async function getTellerById(id: number, branchId: number) {
 }
 
 export async function createTeller(data: typeof tellers.$inferInsert) {
+  const profilePictureUrl = uploadService.persistTemporaryFile(data.profilePictureUrl);
+  const idPictureUrl = uploadService.persistTemporaryFile(data.idPictureUrl);
+
+  data.profilePictureUrl = profilePictureUrl;
+  data.idPictureUrl = idPictureUrl;
+
   const [teller] = await db.insert(tellers).values(data).returning();
   if (!teller) {
     throw new Error("Failed to create teller");

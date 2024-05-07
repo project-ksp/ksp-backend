@@ -1,13 +1,13 @@
 import { db } from "@/db";
 import { branchHeads, branches, members } from "@/db/schemas";
-import { getTableColumns, eq, sql, sum } from "drizzle-orm";
+import { getTableColumns, eq, sql } from "drizzle-orm";
 
 export async function getAllBranches() {
   const sq = db
     .select({
       branchId: members.branchId,
-      totalLoanSum: sum(members.totalLoan).as("totalLoanSum"),
-      totalSavingSum: sum(members.totalSaving).as("totalSavingSum"),
+      totalLoanSum: sql<number>`0`.as("totalLoanSum"),
+      totalSavingSum: sql<number>`0`.as("totalSavingSum"),
       activeCount: sql<number>`SUM(CASE WHEN ${members.isActive} = true THEN 1 ELSE 0 END)`.as("activeCount"),
       inactiveCount: sql<number>`SUM(CASE WHEN ${members.isActive} = false THEN 1 ELSE 0 END)`.as("inactiveCount"),
     })

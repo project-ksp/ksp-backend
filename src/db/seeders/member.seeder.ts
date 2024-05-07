@@ -6,6 +6,7 @@ export default async function seed() {
   const memberData = await Promise.all(Array.from({ length: 1000 }, memberFactory));
   const branches = await db.query.branches.findMany();
   const leaders = await db.query.leaders.findMany();
+  const users = await db.query.users.findMany();
 
   const branchesPerBatch = Math.floor(memberData.length / branches.length);
   for (let i = 0; i < branches.length; i++) {
@@ -18,6 +19,13 @@ export default async function seed() {
   for (let i = 0; i < leaders.length; i++) {
     for (let j = 0; j < leadersPerBatch; j++) {
       Object.assign(memberData[i * leadersPerBatch + j]!, { leaderId: leaders[i]!.id });
+    }
+  }
+
+  const usersPerBatch = Math.ceil(memberData.length / users.length);
+  for (let i = 0; i < users.length; i++) {
+    for (let j = 0; j < usersPerBatch && i * usersPerBatch + j < memberData.length; j++) {
+      Object.assign(memberData[i * usersPerBatch + j]!, { userId: users[i]!.id });
     }
   }
 

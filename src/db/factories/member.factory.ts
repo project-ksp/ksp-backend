@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import type { members } from "../schemas/members.schema";
-import { genderEnum } from "../schemas";
+import { educationEnum, genderEnum, religionEnum } from "../schemas";
 
 export default async function memberFactory(): Promise<typeof members.$inferInsert> {
   const member = {
@@ -8,9 +8,21 @@ export default async function memberFactory(): Promise<typeof members.$inferInse
     name: faker.person.fullName(),
     nik: faker.string.numeric(16),
     gender: genderEnum.enumValues[faker.number.int(genderEnum.enumValues.length)] ?? "laki-laki",
-    totalSaving: faker.number.int({ min: 0, max: 100000000 }),
-    totalLoan: faker.number.int({ min: 0, max: 100000000 }),
     isActive: faker.datatype.boolean(),
+
+    birthPlace: faker.location.city(),
+    birthDate: faker.date.past().toISOString().split("T")[0]!,
+    religion: religionEnum.enumValues[faker.number.int(religionEnum.enumValues.length)] ?? "islam",
+    occupation: faker.person.jobTitle(),
+    address: faker.location.streetAddress(),
+    kelurahan: faker.location.buildingNumber(),
+    kecamatan: faker.location.cardinalDirection(),
+    city: faker.location.city(),
+    postalCode: faker.string.numeric(5),
+    phoneNumber: faker.string.numeric(12),
+    education: educationEnum.enumValues[faker.number.int(educationEnum.enumValues.length)] ?? "sma",
+    profilePictureUrl: "placeholder.png",
+    idPictureUrl: "placeholder.png",
   };
 
   return member;

@@ -1,21 +1,37 @@
-import { bigint, boolean, pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
-import { genderEnum } from "./enums.schema";
+import { boolean, date, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { educationEnum, genderEnum, religionEnum } from "./enums.schema";
 import { branches } from "./branches.schema";
 import { relations } from "drizzle-orm";
 import { leaders } from "./leaders.schema";
+import { users } from "./users.schema";
 
 export const members = pgTable("members", {
   id: varchar("id", { length: 20 }).primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
   nik: varchar("nik", { length: 16 }).unique().notNull(),
   gender: genderEnum("gender").notNull(),
-  totalSaving: bigint("total_saving", { mode: "number" }).notNull().default(0),
-  totalLoan: bigint("total_loan", { mode: "number" }).notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
   branchId: serial("branch_id").references(() => branches.id),
   leaderId: serial("leader_id").references(() => leaders.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+
+  isMarried: boolean("is_married").notNull().default(false),
+  spouse: varchar("spouse", { length: 256 }),
+  birthPlace: varchar("birth_place", { length: 256 }).notNull(),
+  birthDate: date("birth_date", { mode: "string" }).notNull(),
+  religion: religionEnum("religion").notNull(),
+  occupation: varchar("occupation", { length: 256 }).notNull(),
+  address: text("address").notNull(),
+  kelurahan: varchar("kelurahan", { length: 256 }).notNull(),
+  kecamatan: varchar("kecamatan", { length: 256 }).notNull(),
+  city: varchar("city", { length: 256 }).notNull(),
+  postalCode: varchar("postal_code", { length: 5 }).notNull(),
+  education: educationEnum("education").notNull(),
+  phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+  profilePictureUrl: varchar("profile_picture_url", { length: 256 }).notNull(),
+  idPictureUrl: varchar("id_picture_url", { length: 256 }).notNull(),
+  userId: serial("user_id").references(() => users.id),
 });
 
 export const membersRelations = relations(members, ({ one }) => ({
@@ -26,5 +42,9 @@ export const membersRelations = relations(members, ({ one }) => ({
   leader: one(leaders, {
     fields: [members.leaderId],
     references: [leaders.id],
+  }),
+  user: one(users, {
+    fields: [members.userId],
+    references: [users.id],
   }),
 }));

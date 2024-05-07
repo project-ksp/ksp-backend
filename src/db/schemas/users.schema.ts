@@ -2,6 +2,8 @@ import { pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
 import { roleEnum } from "./enums.schema";
 import { branches } from "./branches.schema";
 import { createInsertSchema } from "drizzle-zod";
+import { relations } from "drizzle-orm";
+import { members } from "./members.schema";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -13,6 +15,10 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  members: many(members),
+}));
 
 export const userInsertSchema = createInsertSchema(users)
   .strict()

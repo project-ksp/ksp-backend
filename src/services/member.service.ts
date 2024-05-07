@@ -15,10 +15,10 @@ export async function getAllMembers({
   return db.query.members.findMany({
     where: (members, { eq, ilike, and, or }) =>
       and(
-        and(...Object.entries(where).map(([key, value]) => eq(members[key as keyof typeof members], value))),
+        and(...Object.entries(where).map(([key, value]) => eq(members[key as keyof typeof members], value!))),
         or(
           ...Object.entries(query).map(([key, value]) =>
-            ilike(members[key as keyof typeof members], `%${value.toString()}%`),
+            ilike(members[key as keyof typeof members], `%${value?.toString()}%`),
           ),
         ),
       ),

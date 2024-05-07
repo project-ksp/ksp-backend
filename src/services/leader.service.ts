@@ -59,7 +59,7 @@ export async function createLeader(data: typeof leaders.$inferInsert) {
   return leader;
 }
 
-export async function updateLeader(id: number, data: z.infer<typeof updateLeaderSchema>) {
+export async function updateLeader(id: number, data: Partial<z.infer<typeof updateLeaderSchema>>) {
   const [leader] = await db.update(leaders).set(data).where(eq(leaders.id, id)).returning();
   if (!leader) {
     throw new Error("Failed to update Leader");

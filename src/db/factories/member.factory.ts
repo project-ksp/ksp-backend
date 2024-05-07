@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import type { members } from "../schemas/members.schema";
-import { educationEnum, genderEnum, religionEnum } from "../schemas";
+import { educationEnum, genderEnum, memberStatusEnum, religionEnum } from "../schemas";
 
 export default async function memberFactory(): Promise<typeof members.$inferInsert> {
   const member = {
@@ -23,6 +23,9 @@ export default async function memberFactory(): Promise<typeof members.$inferInse
     education: educationEnum.enumValues[faker.number.int(educationEnum.enumValues.length)] ?? "sma",
     profilePictureUrl: "placeholder.png",
     idPictureUrl: "placeholder.png",
+
+    status: memberStatusEnum.enumValues[faker.number.int(memberStatusEnum.enumValues.length)] ?? "diproses",
+    verified: faker.datatype.boolean(),
   };
 
   return member;

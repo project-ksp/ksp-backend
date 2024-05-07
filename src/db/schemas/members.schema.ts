@@ -1,9 +1,10 @@
 import { boolean, date, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
-import { educationEnum, genderEnum, religionEnum } from "./enums.schema";
+import { educationEnum, genderEnum, memberStatusEnum, religionEnum } from "./enums.schema";
 import { branches } from "./branches.schema";
 import { relations } from "drizzle-orm";
 import { leaders } from "./leaders.schema";
 import { users } from "./users.schema";
+import { createInsertSchema } from "drizzle-zod";
 
 export const members = pgTable("members", {
   id: varchar("id", { length: 20 }).primaryKey(),
@@ -32,6 +33,9 @@ export const members = pgTable("members", {
   profilePictureUrl: varchar("profile_picture_url", { length: 256 }).notNull(),
   idPictureUrl: varchar("id_picture_url", { length: 256 }).notNull(),
   userId: serial("user_id").references(() => users.id),
+
+  status: memberStatusEnum("status").default("diproses"),
+  verified: boolean("verified").notNull().default(false),
 });
 
 export const membersRelations = relations(members, ({ one }) => ({
@@ -48,3 +52,9 @@ export const membersRelations = relations(members, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const updateMemberSchema = createInsertSchema(members).omit({
+  profilePictureUrl: true,
+  idPictureUrl: true,
+  createdAt: true,
+});

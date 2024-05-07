@@ -1,7 +1,8 @@
 import { db } from "@/db";
-import { members } from "@/db/schemas";
-import { count } from "drizzle-orm";
+import { members, updateMemberSchema } from "@/db/schemas";
+import { count, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
+import { z } from "zod";
 
 export async function getAllMembers({
   where = {},
@@ -60,4 +61,28 @@ export async function getAllMembersWithPagination(page = 1) {
     totalPages,
     members: data,
   };
+}
+
+export async function getMemberById(id: string) {
+  return db.query.members.findFirst({
+    where: (members, { eq }) => eq(members.id, id),
+    with: {
+      leader: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+}
+
+export async function updateMember(id: string, data: Partial<z.infer<typeof updateMemberSchema>>) {
+  data.updatedAt = new Date();
+  const [member] = await db.update(members).set(data).where(eq(members.id, id)).returning();
+  if (!member) {
+    throw new Error("Member not found");
+  }
+
+  return member;
 }

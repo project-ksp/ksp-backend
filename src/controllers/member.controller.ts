@@ -67,7 +67,7 @@ export async function updateStatus(request: FastifyRequest<UpdateStatusMemberSch
   const { status } = request.body;
 
   try {
-    const data = await memberService.updateMember(id, { status: status });
+    const data = await memberService.updateMember(id, { status });
     reply.send({
       message: "Member status successfully updated.",
       data,

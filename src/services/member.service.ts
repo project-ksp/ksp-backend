@@ -1,8 +1,8 @@
 import { db } from "@/db";
-import { members, updateMemberSchema } from "@/db/schemas";
+import { members, type updateMemberSchema } from "@/db/schemas";
 import { count, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
-import { z } from "zod";
+import type { z } from "zod";
 
 export async function getAllMembers({
   where = {},

@@ -105,6 +105,26 @@ export async function getMemberById(id: string) {
           name: true,
         },
       },
+      deposits: {
+        columns: {
+          principalDeposit: true,
+          voluntaryDeposit: true,
+        },
+        with: {
+          monthlyDeposits: {
+            columns: {
+              deposit: true,
+            },
+          },
+          monthlyLoans: {
+            columns: {
+              loan: true,
+            },
+          },
+        },
+        orderBy: (deposits, { desc }) => desc(deposits.createdAt),
+        limit: 1,
+      },
     },
   });
 }

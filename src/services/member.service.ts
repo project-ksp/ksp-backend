@@ -161,5 +161,7 @@ async function generateId(data: z.infer<typeof insertMemberSchema>) {
       .where(eq(members.branchId, branchId!))
   )[0]!;
 
-  return `01.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
+  const regionId = data.nik.startsWith("35") ? "01" : "02";
+
+  return `${regionId}.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
 }

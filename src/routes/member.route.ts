@@ -11,6 +11,11 @@ const memberRoutes = async (fastify: FastifyInstance) => {
   fastify.get("/", { schema: indexMemberSchema, preHandler: [fastify.authorize(["owner"])] }, memberController.index);
   fastify.get("/recap", { preHandler: [fastify.authorize(["branch_head", "teller"])] }, memberController.indexRecap);
   fastify.get(
+    "/pending",
+    { preHandler: [fastify.authorize(["branch_head", "teller"])] },
+    memberController.indexPending,
+  );
+  fastify.get(
     "/search",
     { schema: searchMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
     memberController.search,

@@ -1,4 +1,4 @@
-import { bigint, timestamp, pgTable, serial, smallint, varchar } from "drizzle-orm/pg-core";
+import { bigint, timestamp, pgTable, serial, varchar } from "drizzle-orm/pg-core";
 import { deposits } from "./deposits.schema";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -7,7 +7,6 @@ import { leaders } from "./leaders.schema";
 
 export const monthlyLoans = pgTable("monthly_loans", {
   id: serial("id").primaryKey(),
-  month: smallint("month").notNull(),
   loan: bigint("loan", { mode: "number" }).notNull(),
   branchId: serial("branch_id")
     .notNull()

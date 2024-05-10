@@ -116,11 +116,7 @@ export async function getMemberById(id: string) {
               deposit: true,
             },
           },
-          monthlyLoans: {
-            columns: {
-              loan: true,
-            },
-          },
+          monthlyLoans: true,
         },
         orderBy: (deposits, { desc }) => desc(deposits.createdAt),
         limit: 1,

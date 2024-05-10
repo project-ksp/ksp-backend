@@ -45,6 +45,11 @@ export async function getAllMembers({
               deposit: true,
             },
           },
+          monthlyLoans: {
+            columns: {
+              loan: true,
+            },
+          },
         },
         orderBy: (deposits, { desc }) => desc(deposits.createdAt),
         limit: 1,
@@ -59,6 +64,7 @@ export async function getAllMembers({
           member.deposits[0].principalDeposit +
           member.deposits[0].voluntaryDeposit +
           member.deposits[0].monthlyDeposits.reduce((acc, curr) => acc + curr.deposit, 0),
+        totalLoan: member.deposits[0].monthlyLoans.reduce((acc, curr) => acc + curr.loan, 0),
         deposits: undefined,
       });
     }

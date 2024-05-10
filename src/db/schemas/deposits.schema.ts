@@ -3,6 +3,7 @@ import { bigint, pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core
 import { monthlyDeposits } from "./monthlyDeposits.schema";
 import { members } from "./members.schema";
 import { createInsertSchema } from "drizzle-zod";
+import { monthlyLoans } from "./monthlyLoans.schema";
 
 export const deposits = pgTable("deposits", {
   id: serial("id").primaryKey(),
@@ -19,6 +20,7 @@ export const depositsRelations = relations(deposits, ({ one, many }) => ({
     references: [members.id],
   }),
   monthlyDeposits: many(monthlyDeposits),
+  monthlyLoans: many(monthlyLoans),
 }));
 
 export const insertDepositSchema = createInsertSchema(deposits, {

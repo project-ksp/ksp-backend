@@ -1,7 +1,7 @@
 import * as memberController from "@/controllers/member.controller";
 import type { FastifyInstance } from "fastify";
 import {
-  createDepositMemberSchema,
+  createMemberSchema,
   indexMemberSchema,
   searchMemberSchema,
   updateStatusMemberSchema,
@@ -22,9 +22,9 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     memberController.search,
   );
   fastify.post(
-    "/deposit",
-    { schema: createDepositMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
-    memberController.createDeposit,
+    "/",
+    { schema: createMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
+    memberController.create,
   );
   fastify.put(
     "/:id/status",

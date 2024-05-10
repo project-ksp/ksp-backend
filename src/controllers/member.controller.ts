@@ -3,7 +3,7 @@ import * as branchService from "@/services/branch.service";
 import * as memberService from "@/services/member.service";
 import * as depositService from "@/services/deposit.service";
 import type {
-  CreateDepositMemberSchema,
+  CreateMemberSchema,
   IndexMemberSchema,
   SearchMemberSchema,
   UpdateStatusMemberSchema,
@@ -15,6 +15,7 @@ import { insertDepositSchema } from "@/db/schemas/deposits.schema";
 import { z } from "zod";
 import { insertMonthlyDepositSchema } from "@/db/schemas/monthlyDeposits.schema";
 import { db } from "@/db";
+import { insertMonthlyLoanSchema } from "@/db/schemas/monthlyLoans.schema";
 
 export async function index(request: FastifyRequest<IndexMemberSchema>, reply: FastifyReply) {
   const { page } = request.query;
@@ -80,7 +81,7 @@ export async function search(request: FastifyRequest<SearchMemberSchema>, reply:
   }
 }
 
-export async function createDeposit(request: FastifyRequest<CreateDepositMemberSchema>, reply: FastifyReply) {
+export async function create(request: FastifyRequest<CreateMemberSchema>, reply: FastifyReply) {
   const validatedMember = insertMemberSchema.safeParse(request.body.member);
   if (!validatedMember.success) {
     return reply.status(400).send({
@@ -95,25 +96,45 @@ export async function createDeposit(request: FastifyRequest<CreateDepositMemberS
     });
   }
 
-  const validatedMonthlyDeposits = z.array(insertMonthlyDepositSchema).safeParse(request.body.monthlyDeposits);
-  if (!validatedMonthlyDeposits.success) {
-    return reply.status(400).send({
-      message: fromError(validatedMonthlyDeposits.error).toString(),
-    });
-  }
-
   Object.assign(validatedMember.data, { branchId: request.user.branchId, userId: request.user.id });
   const member = await memberService.createMember(validatedMember.data);
 
   Object.assign(validatedDeposit.data, { memberId: member.id });
   const deposit = await depositService.createDeposit(validatedDeposit.data);
 
-  await Promise.all(
-    validatedMonthlyDeposits.data.map(async (monthlyDeposit) => {
-      Object.assign(monthlyDeposit, { depositId: deposit.id });
-      return depositService.createMonthlyDeposit(monthlyDeposit);
-    }),
-  );
+  if (request.body.monthlyDeposits) {
+    const validatedMonthlyDeposits = z.array(insertMonthlyDepositSchema).safeParse(request.body.monthlyDeposits);
+    if (!validatedMonthlyDeposits.success) {
+      return reply.status(400).send({
+        message: fromError(validatedMonthlyDeposits.error).toString(),
+      });
+    }
+
+    const data = validatedMonthlyDeposits.data;
+    await Promise.all(
+      data.map(async (monthlyDeposit) => {
+        Object.assign(monthlyDeposit, { depositId: deposit.id });
+      }),
+    );
+    depositService.createMonthlyDeposits(data);
+  }
+
+  if (request.body.monthlyLoans) {
+    const validatedMonthlyLoans = z.array(insertMonthlyLoanSchema).safeParse(request.body.monthlyLoans);
+    if (!validatedMonthlyLoans.success) {
+      return reply.status(400).send({
+        message: fromError(validatedMonthlyLoans.error).toString(),
+      });
+    }
+
+    const data = validatedMonthlyLoans.data;
+    await Promise.all(
+      data.map(async (monthlyLoan) => {
+        Object.assign(monthlyLoan, { depositId: deposit.id });
+      }),
+    );
+    depositService.createMonthlyLoans(data);
+  }
 
   reply.send({
     message: "Deposit successfully created.",
@@ -122,6 +143,7 @@ export async function createDeposit(request: FastifyRequest<CreateDepositMemberS
         deposits: {
           with: {
             monthlyDeposits: true,
+            monthlyLoans: true,
           },
         },
       },

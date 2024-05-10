@@ -20,7 +20,7 @@ export const searchMemberSchema = {
   } as const,
 };
 
-export const createDepositMemberSchema = {
+export const createMemberSchema = {
   body: {
     type: "object",
     required: ["member", "deposit"],
@@ -28,6 +28,7 @@ export const createDepositMemberSchema = {
       member: { type: "object" },
       deposit: { type: "object" },
       monthlyDeposits: { type: "array" },
+      monthlyLoans: { type: "array" },
     },
   } as const,
 };
@@ -62,5 +63,5 @@ export const verifyMemberSchema = {
 export type IndexMemberSchema = SchemaToRequestTypes<typeof indexMemberSchema>;
 export type SearchMemberSchema = SchemaToRequestTypes<typeof searchMemberSchema>;
 export type UpdateStatusMemberSchema = SchemaToRequestTypes<typeof updateStatusMemberSchema>;
-export type CreateDepositMemberSchema = SchemaToRequestTypes<typeof createDepositMemberSchema>;
+export type CreateMemberSchema = SchemaToRequestTypes<typeof createMemberSchema>;
 export type VerifyMemberSchema = SchemaToRequestTypes<typeof verifyMemberSchema>;

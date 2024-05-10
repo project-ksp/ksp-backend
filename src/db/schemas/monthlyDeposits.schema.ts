@@ -19,7 +19,10 @@ export const monthlyDepositsRelations = relations(monthlyDeposits, ({ one }) => 
   }),
 }));
 
-export const insertMonthlyDepositSchema = createInsertSchema(monthlyDeposits).omit({
+export const insertMonthlyDepositSchema = createInsertSchema(monthlyDeposits, {
+  month: (schema) => schema.month.positive(),
+  deposit: (schema) => schema.deposit.positive().min(50000),
+}).omit({
   createdAt: true,
   updatedAt: true,
 });

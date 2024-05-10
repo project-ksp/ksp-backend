@@ -23,6 +23,7 @@ export function isTemporaryFileExists(name: string) {
   if (name === placeholderFilename) {
     return true;
   }
+
   const location = path.join(tempDir, name);
   return fs.existsSync(location);
 }
@@ -31,6 +32,7 @@ export function persistTemporaryFile(name: string) {
   if (name === placeholderFilename) {
     return name;
   }
+
   const newName = `uploads/${name}`;
   const source = path.join(tempDir, name);
   const destination = path.join(uploadDir, newName);

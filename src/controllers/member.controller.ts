@@ -109,7 +109,7 @@ export async function createDeposit(request: FastifyRequest<CreateDepositMemberS
   const deposit = await depositService.createDeposit(validatedDeposit.data);
 
   await Promise.all(
-    validatedMonthlyDeposits.data.map((monthlyDeposit) => {
+    validatedMonthlyDeposits.data.map(async (monthlyDeposit) => {
       Object.assign(monthlyDeposit, { depositId: deposit.id });
       return depositService.createMonthlyDeposit(monthlyDeposit);
     }),

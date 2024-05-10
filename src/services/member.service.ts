@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { insertMemberSchema, members, type updateMemberSchema } from "@/db/schemas";
+import { members, type insertMemberSchema, type updateMemberSchema } from "@/db/schemas";
 import { count, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
 import type { z } from "zod";
@@ -92,6 +92,7 @@ export async function createMember(data: z.infer<typeof insertMemberSchema>) {
   if (!member) {
     throw new Error("Failed to create member");
   }
+
   return member;
 }
 
@@ -106,8 +107,7 @@ export async function updateMember(id: string, data: Partial<z.infer<typeof upda
 }
 
 async function generateId(data: z.infer<typeof insertMemberSchema>) {
-  const branchId = data.branchId!;
-  const leaderId = data.leaderId!;
+  const { branchId, leaderId } = data;
 
   const { value } = (
     await db
@@ -115,7 +115,7 @@ async function generateId(data: z.infer<typeof insertMemberSchema>) {
         value: count(members.id),
       })
       .from(members)
-      .where(eq(members.branchId, branchId))
+      .where(eq(members.branchId, branchId!))
   )[0]!;
 
   return `01.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;

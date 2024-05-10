@@ -141,6 +141,13 @@
       "when": 1715329833352,
       "tag": "0019_yummy_monster_badoon",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1715330870685,
+      "tag": "0020_chief_siren",
+      "breakpoints": true
     }
   ]
 }

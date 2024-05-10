@@ -5,7 +5,7 @@ import { createInsertSchema } from "drizzle-zod";
 
 export const monthlyDeposits = pgTable("monthly_deposits", {
   id: serial("id").primaryKey(),
-  month: smallint("month").unique().notNull(),
+  month: smallint("month").notNull(),
   deposit: bigint("deposit", { mode: "number" }).notNull(),
   depositId: serial("deposit_id").references(() => deposits.id),
   createdAt: timestamp("created_at").defaultNow(),

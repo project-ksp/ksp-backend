@@ -35,7 +35,10 @@ export async function getAllMembers({
   });
 }
 
-export async function getAllMembersWithPagination(page = 1) {
+export async function getAllMembersWithPagination(
+  page = 1,
+  { where = {} }: { where?: Partial<typeof members.$inferSelect> } = {},
+) {
   const pageCount = (await db.select({ count: count() }).from(members))[0]!;
   const totalPages = Math.ceil(pageCount.count / PAGE_SIZE);
 
@@ -44,6 +47,8 @@ export async function getAllMembersWithPagination(page = 1) {
   }
 
   const data = await db.query.members.findMany({
+    where: (members, { eq, and }) =>
+      and(...Object.entries(where).map(([key, value]) => eq(members[key as keyof typeof members], value!))),
     limit: 10,
     offset: (page - 1) * 10,
     with: {

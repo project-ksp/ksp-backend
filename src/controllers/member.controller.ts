@@ -12,7 +12,7 @@ export async function index(request: FastifyRequest<IndexMemberSchema>, reply: F
   const { page } = request.query;
 
   try {
-    const data = await memberService.getAllMembersWithPagination(page);
+    const data = await memberService.getAllMembersWithPagination(page, { where: { verified: true } });
     reply.send({
       message: "Members successfully fetched.",
       data,
@@ -33,7 +33,7 @@ export async function indexRecap(request: FastifyRequest, reply: FastifyReply) {
   }
 
   const data = await memberService.getAllMembers({
-    where: { branchId: request.user.branchId, isActive: true },
+    where: { branchId: request.user.branchId, isActive: true, verified: true },
     limit: branch.publishAmount,
   });
 
@@ -58,7 +58,7 @@ export async function search(request: FastifyRequest<SearchMemberSchema>, reply:
 
   try {
     const data = await memberService.getAllMembers({
-      where: { branchId: request.user.branchId },
+      where: { branchId: request.user.branchId, verified: true },
       query: { id: query, name: query },
     });
     reply.send({

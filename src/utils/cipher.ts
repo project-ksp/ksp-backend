@@ -10,7 +10,7 @@ import { env } from "./env";
 
 async function encrypt(data: string) {
   const iv = crypto.randomBytes(16);
-  const key = crypto.pbkdf2Sync(env.APP_KEY, iv, 2000, 32, "sha256");
+  const key = crypto.pbkdf2Sync(env.APP_ENCRYPTION_KEY, iv, 2000, 32, "sha256");
 
   const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
   const encrypted = cipher.update(data, "utf8", "base64") + cipher.final("base64");
@@ -26,7 +26,7 @@ async function decrypt(data: string) {
   }
 
   const iv = Buffer.from(ivBase64, "base64");
-  const key = crypto.pbkdf2Sync(env.APP_KEY, iv, 2000, 32, "sha256");
+  const key = crypto.pbkdf2Sync(env.APP_ENCRYPTION_KEY, iv, 2000, 32, "sha256");
 
   const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
   const decrypted = decipher.update(encrypted, "base64", "utf8") + decipher.final("utf8");

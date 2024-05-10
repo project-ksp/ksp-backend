@@ -13,7 +13,7 @@ export const members = pgTable("members", {
   gender: genderEnum("gender").notNull(),
   isActive: boolean("is_active").notNull().default(true),
   branchId: serial("branch_id").references(() => branches.id),
-  leaderId: serial("leader_id").references(() => leaders.id),
+  leaderId: varchar("leader_id", { length: 32 }).references(() => leaders.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 

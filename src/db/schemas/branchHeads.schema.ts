@@ -3,6 +3,7 @@ import { educationEnum, genderEnum, religionEnum } from "./enums.schema";
 import { createInsertSchema } from "drizzle-zod";
 import { branches } from "./branches.schema";
 import { relations } from "drizzle-orm";
+import * as uploadService from "@/services/upload.service";
 
 export const branchHeads = pgTable("branch_heads", {
   id: serial("id").primaryKey(),
@@ -36,4 +37,19 @@ export const branchHeadsRelations = relations(branchHeads, ({ one }) => ({
   }),
 }));
 
-export const insertBranchHeadSchema = createInsertSchema(branchHeads);
+export const insertBranchHeadSchema = createInsertSchema(branchHeads)
+  .omit({
+    createdAt: true,
+    updatedAt: true,
+  })
+  .refine((input) => input.profilePictureUrl !== input.idPictureUrl, {
+    message: "Profile picture and ID picture must be different.",
+  })
+  .refine(
+    (input) =>
+      uploadService.isTemporaryFileExists(input.profilePictureUrl) &&
+      uploadService.isTemporaryFileExists(input.idPictureUrl),
+    {
+      message: "Profile picture or ID picture is not uploaded yet.",
+    },
+  );

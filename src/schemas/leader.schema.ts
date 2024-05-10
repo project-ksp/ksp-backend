@@ -5,7 +5,7 @@ export const showLeaderSchema = {
     type: "object",
     required: ["id"],
     properties: {
-      id: { type: "number" },
+      id: { type: "string" },
     },
   } as const,
 };
@@ -15,7 +15,7 @@ export const updateLeaderSchema = {
     type: "object",
     required: ["id"],
     properties: {
-      id: { type: "number" },
+      id: { type: "string" },
     },
   } as const,
 };

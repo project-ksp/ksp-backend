@@ -39,6 +39,9 @@ export const insertTellerSchema = createInsertSchema(tellers)
     createdAt: true,
     updatedAt: true,
   })
+  .refine((input) => input.profilePictureUrl !== input.idPictureUrl, {
+    message: "Profile picture and ID picture must be different.",
+  })
   .refine(
     (input) =>
       uploadService.isTemporaryFileExists(input.profilePictureUrl) &&

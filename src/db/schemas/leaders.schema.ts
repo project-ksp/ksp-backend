@@ -7,7 +7,7 @@ import { relations } from "drizzle-orm";
 import { members } from "./members.schema";
 
 export const leaders = pgTable("leaders", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", { length: 32 }).unique().primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
   birthPlace: varchar("birth_place", { length: 256 }).notNull(),
   birthDate: date("birth_date", { mode: "string" }).notNull(),
@@ -38,8 +38,12 @@ export const leadersRelations = relations(leaders, ({ one, many }) => ({
 
 export const insertLeaderSchema = createInsertSchema(leaders)
   .omit({
+    id: true,
     createdAt: true,
     updatedAt: true,
+  })
+  .refine((input) => input.profilePictureUrl !== input.idPictureUrl, {
+    message: "Profile picture and ID picture must be different.",
   })
   .refine(
     (input) =>
@@ -51,6 +55,7 @@ export const insertLeaderSchema = createInsertSchema(leaders)
   );
 
 export const updateLeaderSchema = createInsertSchema(leaders).omit({
+  id: true,
   profilePictureUrl: true,
   idPictureUrl: true,
   createdAt: true,

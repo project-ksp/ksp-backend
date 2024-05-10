@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { leaders, members, type updateLeaderSchema } from "@/db/schemas";
+import { leaders, members, type insertLeaderSchema, type updateLeaderSchema } from "@/db/schemas";
 import { and, count, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import * as uploadService from "@/services/upload.service";
@@ -22,7 +22,7 @@ export async function getAllLeaders({ where = {} }: { where?: Partial<typeof lea
     .groupBy(leaders.id);
 }
 
-export async function getLeaderById(id: number, branchId: number) {
+export async function getLeaderById(id: string, branchId: number) {
   const data = await db.query.leaders.findFirst({
     where: and(eq(leaders.id, id), eq(leaders.branchId, branchId)),
     extras: {
@@ -44,14 +44,17 @@ export async function getLeaderById(id: number, branchId: number) {
   return data;
 }
 
-export async function createLeader(data: typeof leaders.$inferInsert) {
+export async function createLeader(data: z.infer<typeof insertLeaderSchema>) {
   const profilePictureUrl = uploadService.persistTemporaryFile(data.profilePictureUrl);
   const idPictureUrl = uploadService.persistTemporaryFile(data.idPictureUrl);
 
   data.profilePictureUrl = profilePictureUrl;
   data.idPictureUrl = idPictureUrl;
 
-  const [leader] = await db.insert(leaders).values(data).returning();
+  const [leader] = await db
+    .insert(leaders)
+    .values({ id: await generateId(data.branchId!), ...data })
+    .returning();
   if (!leader) {
     throw new Error("Failed to create Leader");
   }
@@ -59,11 +62,23 @@ export async function createLeader(data: typeof leaders.$inferInsert) {
   return leader;
 }
 
-export async function updateLeader(id: number, data: Partial<z.infer<typeof updateLeaderSchema>>) {
+export async function updateLeader(id: string, data: Partial<z.infer<typeof updateLeaderSchema>>) {
   const [leader] = await db.update(leaders).set(data).where(eq(leaders.id, id)).returning();
   if (!leader) {
     throw new Error("Failed to update Leader");
   }
 
   return leader;
+}
+
+async function generateId(branchId: number) {
+  const { value } = (
+    await db
+      .select({
+        value: count(leaders.id),
+      })
+      .from(leaders)
+  )[0]!;
+
+  return `${branchId.toString().padStart(2, "0")}.${(value + 1).toString().padStart(5, "0")}`;
 }

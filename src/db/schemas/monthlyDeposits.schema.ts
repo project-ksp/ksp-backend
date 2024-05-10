@@ -1,4 +1,4 @@
-import { bigint, date, pgTable, serial, smallint } from "drizzle-orm/pg-core";
+import { bigint, timestamp, pgTable, serial, smallint } from "drizzle-orm/pg-core";
 import { deposits } from "./deposits.schema";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -8,8 +8,8 @@ export const monthlyDeposits = pgTable("monthly_deposits", {
   month: smallint("month").unique().notNull(),
   deposit: bigint("deposit", { mode: "number" }).notNull(),
   depositId: serial("deposit_id").references(() => deposits.id),
-  createdAt: date("created_at").defaultNow(),
-  updatedAt: date("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const monthlyDepositsRelations = relations(monthlyDeposits, ({ one }) => ({

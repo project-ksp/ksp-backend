@@ -1,4 +1,5 @@
 import * as memberController from "@/controllers/member.controller";
+import * as monthlyLoanController from "@/controllers/monthlyLoan.controller";
 import type { FastifyInstance } from "fastify";
 import {
   createMemberSchema,
@@ -8,6 +9,7 @@ import {
   updateStatusMemberSchema,
   verifyMemberSchema,
 } from "@/schemas/member.schema";
+import { createMonthlyLoanSchema } from "@/schemas/monthlyLoan.schema";
 
 const memberRoutes = async (fastify: FastifyInstance) => {
   fastify.get("/", { schema: indexMemberSchema, preHandler: [fastify.authorize(["owner"])] }, memberController.index);
@@ -37,6 +39,14 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     "/:id/verify",
     { schema: verifyMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
     memberController.verify,
+  );
+  fastify.post(
+    "/:id/loan",
+    {
+      schema: createMonthlyLoanSchema,
+      preHandler: [fastify.authorize(["branch_head", "teller"])],
+    },
+    monthlyLoanController.create,
   );
 };
 

@@ -107,6 +107,7 @@ export async function getMemberById(id: string) {
       },
       deposits: {
         columns: {
+          id: true,
           principalDeposit: true,
           voluntaryDeposit: true,
         },

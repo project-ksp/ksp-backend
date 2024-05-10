@@ -8,12 +8,14 @@ export async function getAllMembers({
   where = {},
   query = {},
   limit,
+  offset,
 }: {
   where?: Partial<typeof members.$inferSelect>;
   query?: Partial<typeof members.$inferSelect>;
   limit?: number;
+  offset?: number;
 }) {
-  return db.query.members.findMany({
+  const data = await db.query.members.findMany({
     where: (members, { eq, ilike, and, or }) =>
       and(
         and(...Object.entries(where).map(([key, value]) => eq(members[key as keyof typeof members], value!))),
@@ -24,6 +26,7 @@ export async function getAllMembers({
         ),
       ),
     limit,
+    offset,
     with: {
       leader: {
         columns: {
@@ -31,8 +34,37 @@ export async function getAllMembers({
           name: true,
         },
       },
+      deposits: {
+        columns: {
+          principalDeposit: true,
+          voluntaryDeposit: true,
+        },
+        with: {
+          monthlyDeposits: {
+            columns: {
+              deposit: true,
+            },
+          },
+        },
+        orderBy: (deposits, { desc }) => desc(deposits.createdAt),
+        limit: 1,
+      },
     },
   });
+
+  data.forEach((member) => {
+    if (member.deposits[0]) {
+      Object.assign(member, {
+        totalDeposit:
+          member.deposits[0].principalDeposit +
+          member.deposits[0].voluntaryDeposit +
+          member.deposits[0].monthlyDeposits.reduce((acc, curr) => acc + curr.deposit, 0),
+        deposits: undefined,
+      });
+    }
+  });
+
+  return data;
 }
 
 export async function getAllMembersWithPagination(
@@ -46,25 +78,14 @@ export async function getAllMembersWithPagination(
     throw new Error("Invalid page number.");
   }
 
-  const data = await db.query.members.findMany({
-    where: (members, { eq, and }) =>
-      and(...Object.entries(where).map(([key, value]) => eq(members[key as keyof typeof members], value!))),
-    limit: 10,
-    offset: (page - 1) * 10,
-    with: {
-      leader: {
-        columns: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-  });
-
   return {
     page,
     totalPages,
-    members: data,
+    members: await getAllMembers({
+      where,
+      limit: PAGE_SIZE,
+      offset: (page - 1) * PAGE_SIZE,
+    }),
   };
 }
 

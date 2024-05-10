@@ -10,6 +10,8 @@ const pump = util.promisify(pipeline);
 const tempDir = path.join(__dirname, "../storage/tmp");
 const uploadDir = path.join(__dirname, "../storage/public");
 
+const placeholderFilename = "placeholder.png";
+
 export async function storeTemporary(data: MultipartFile) {
   const name = crypto.randomUUID() + "." + mime.extension(data.mimetype);
   const location = path.join(tempDir, name);
@@ -18,11 +20,17 @@ export async function storeTemporary(data: MultipartFile) {
 }
 
 export function isTemporaryFileExists(name: string) {
+  if (name === placeholderFilename) {
+    return true;
+  }
   const location = path.join(tempDir, name);
   return fs.existsSync(location);
 }
 
 export function persistTemporaryFile(name: string) {
+  if (name === placeholderFilename) {
+    return name;
+  }
   const newName = `uploads/${name}`;
   const source = path.join(tempDir, name);
   const destination = path.join(uploadDir, newName);

@@ -9,8 +9,19 @@ async function seed() {
     leader: await import("./leader.seeder"),
     member: await import("./member.seeder"),
     teller: await import("./teller.seeder"),
+    deposit: await import("./deposit.seeder"),
+    monthlyDeposit: await import("./monthlyDeposit.seeder"),
   };
-  const deleteOrder: Array<keyof typeof seeders> = ["teller", "member", "leader", "user", "branchHead", "branch"];
+  const deleteOrder: Array<keyof typeof seeders> = [
+    "monthlyDeposit",
+    "deposit",
+    "teller",
+    "member",
+    "leader",
+    "user",
+    "branchHead",
+    "branch",
+  ];
 
   await initDb();
   for (const name of deleteOrder) {

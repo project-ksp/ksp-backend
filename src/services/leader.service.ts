@@ -19,7 +19,15 @@ export async function getAllLeaders({ where = {} }: { where?: Partial<typeof lea
     .from(leaders)
     .where(and(...Object.entries(where).map(([key, value]) => eq(leaders[key as keyof typeof where], value))))
     .leftJoin(members, eq(leaders.id, members.leaderId))
-    .groupBy(leaders.id);
+    .groupBy(
+      leaders.id,
+      leaders.name,
+      leaders.nik,
+      leaders.gender,
+      leaders.city,
+      leaders.phoneNumber,
+      leaders.birthDate,
+    );
 }
 
 export async function getLeaderById(id: string, branchId: number) {
@@ -78,6 +86,7 @@ async function generateId(branchId: number) {
         value: count(leaders.id),
       })
       .from(leaders)
+      .where(eq(leaders.branchId, branchId))
   )[0]!;
 
   return `${branchId.toString().padStart(2, "0")}.${(value + 1).toString().padStart(5, "0")}`;

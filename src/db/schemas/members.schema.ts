@@ -5,15 +5,19 @@ import { relations } from "drizzle-orm";
 import { leaders } from "./leaders.schema";
 import { users } from "./users.schema";
 import { createInsertSchema } from "drizzle-zod";
+import { deposits } from "./deposits.schema";
+import * as uploadService from "@/services/upload.service";
 
 export const members = pgTable("members", {
-  id: varchar("id", { length: 20 }).primaryKey(),
+  id: varchar("id", { length: 32 }).primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
   nik: varchar("nik", { length: 16 }).unique().notNull(),
   gender: genderEnum("gender").notNull(),
   isActive: boolean("is_active").notNull().default(true),
   branchId: serial("branch_id").references(() => branches.id),
-  leaderId: varchar("leader_id", { length: 32 }).references(() => leaders.id),
+  leaderId: varchar("leader_id", { length: 32 })
+    .notNull()
+    .references(() => leaders.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 
@@ -38,7 +42,7 @@ export const members = pgTable("members", {
   verified: boolean("verified").notNull().default(false),
 });
 
-export const membersRelations = relations(members, ({ one }) => ({
+export const membersRelations = relations(members, ({ one, many }) => ({
   branch: one(branches, {
     fields: [members.branchId],
     references: [branches.id],
@@ -51,7 +55,26 @@ export const membersRelations = relations(members, ({ one }) => ({
     fields: [members.userId],
     references: [users.id],
   }),
+  deposits: many(deposits),
 }));
+
+export const insertMemberSchema = createInsertSchema(members)
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+  })
+  .refine((input) => input.profilePictureUrl !== input.idPictureUrl, {
+    message: "Profile picture and ID picture must be different.",
+  })
+  .refine(
+    (input) =>
+      uploadService.isTemporaryFileExists(input.profilePictureUrl) &&
+      uploadService.isTemporaryFileExists(input.idPictureUrl),
+    {
+      message: "Profile picture or ID picture is not uploaded yet.",
+    },
+  );
 
 export const updateMemberSchema = createInsertSchema(members).omit({
   profilePictureUrl: true,

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { insertMonthlyLoanSchema, monthlyLoans } from "@/db/schemas";
+import { monthlyLoans, type insertMonthlyLoanSchema } from "@/db/schemas";
 import { deposits, type insertDepositSchema } from "@/db/schemas/deposits.schema";
 import { monthlyDeposits, type insertMonthlyDepositSchema } from "@/db/schemas/monthlyDeposits.schema";
 import type { z } from "zod";

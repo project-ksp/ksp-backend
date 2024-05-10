@@ -133,7 +133,7 @@ export async function create(request: FastifyRequest<CreateMemberSchema>, reply:
       });
     }
 
-    const data = validatedMonthlyDeposits.data;
+    const { data } = validatedMonthlyDeposits;
     await Promise.all(
       data.map(async (monthlyDeposit) => {
         Object.assign(monthlyDeposit, { depositId: deposit.id });
@@ -150,7 +150,7 @@ export async function create(request: FastifyRequest<CreateMemberSchema>, reply:
       });
     }
 
-    const data = validatedMonthlyLoans.data;
+    const { data } = validatedMonthlyLoans;
     await Promise.all(
       data.map(async (monthlyLoan) => {
         Object.assign(monthlyLoan, { depositId: deposit.id });

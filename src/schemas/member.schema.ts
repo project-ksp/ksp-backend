@@ -20,6 +20,16 @@ export const searchMemberSchema = {
   } as const,
 };
 
+export const showMemberSchema = {
+  params: {
+    type: "object",
+    required: ["id"],
+    properties: {
+      id: { type: "string" },
+    },
+  } as const,
+};
+
 export const createMemberSchema = {
   body: {
     type: "object",
@@ -62,6 +72,7 @@ export const verifyMemberSchema = {
 
 export type IndexMemberSchema = SchemaToRequestTypes<typeof indexMemberSchema>;
 export type SearchMemberSchema = SchemaToRequestTypes<typeof searchMemberSchema>;
-export type UpdateStatusMemberSchema = SchemaToRequestTypes<typeof updateStatusMemberSchema>;
+export type ShowMemberSchema = SchemaToRequestTypes<typeof showMemberSchema>;
 export type CreateMemberSchema = SchemaToRequestTypes<typeof createMemberSchema>;
+export type UpdateStatusMemberSchema = SchemaToRequestTypes<typeof updateStatusMemberSchema>;
 export type VerifyMemberSchema = SchemaToRequestTypes<typeof verifyMemberSchema>;

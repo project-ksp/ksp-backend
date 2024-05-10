@@ -6,6 +6,7 @@ import type {
   CreateMemberSchema,
   IndexMemberSchema,
   SearchMemberSchema,
+  ShowMemberSchema,
   UpdateStatusMemberSchema,
   VerifyMemberSchema,
 } from "@/schemas/member.schema";
@@ -79,6 +80,28 @@ export async function search(request: FastifyRequest<SearchMemberSchema>, reply:
       message: error instanceof Error ? error.message : "An error occurred.",
     });
   }
+}
+
+export async function show(request: FastifyRequest<ShowMemberSchema>, reply: FastifyReply) {
+  const { id } = request.params;
+  const data = await memberService.getMemberById(id);
+
+  if (!data) {
+    return reply.status(404).send({
+      message: "Member not found.",
+    });
+  }
+
+  if (request.user.role !== "owner" && data.branchId !== request.user.branchId) {
+    return reply.status(403).send({
+      message: "Forbidden.",
+    });
+  }
+
+  reply.send({
+    message: "Member successfully fetched.",
+    data,
+  });
 }
 
 export async function create(request: FastifyRequest<CreateMemberSchema>, reply: FastifyReply) {

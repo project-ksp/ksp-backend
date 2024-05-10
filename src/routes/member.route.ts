@@ -4,6 +4,7 @@ import {
   createMemberSchema,
   indexMemberSchema,
   searchMemberSchema,
+  showMemberSchema,
   updateStatusMemberSchema,
   verifyMemberSchema,
 } from "@/schemas/member.schema";
@@ -21,6 +22,7 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     { schema: searchMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
     memberController.search,
   );
+  fastify.get("/:id", { schema: showMemberSchema, preHandler: [fastify.authenticate] }, memberController.show);
   fastify.post(
     "/",
     { schema: createMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },

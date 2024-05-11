@@ -16,6 +16,12 @@ export async function storeTemporary(data: MultipartFile) {
   const name = crypto.randomUUID() + "." + mime.extension(data.mimetype);
   const location = path.join(tempDir, name);
   await pump(data.file, fs.createWriteStream(location));
+
+  if (data.file.truncated) {
+    fs.unlinkSync(location);
+    throw new Error("Max file size is 1 MB");
+  }
+
   return name;
 }
 

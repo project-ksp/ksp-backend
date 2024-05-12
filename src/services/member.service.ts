@@ -6,9 +6,9 @@ import type { z } from "zod";
 import { loans } from "@/db/schemas/loans.schema";
 import * as uploadService from "./upload.service";
 
-const ADMIN_PERCENTAGE = 0.05,
-  MINIMUM_PRINCIPAL_DEPOSIT = 50000,
-  MONTHLY_DEPOSIT = 5000;
+const ADMIN_PERCENTAGE = 0.05;
+const MINIMUM_PRINCIPAL_DEPOSIT = 50000;
+const MONTHLY_DEPOSIT = 5000;
 
 export async function getAllMembers({
   where = {},
@@ -163,7 +163,7 @@ export async function createMemberWithLoan(data: {
       throw new Error("Failed to create member.");
     }
 
-    return db.query.members.findFirst({
+    return await db.query.members.findFirst({
       where: eq(members.id, memberReturned.id),
       with: {
         deposit: {

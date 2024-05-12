@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { members, type insertMemberSchema, deposits } from "@/db/schemas";
-import { count, eq } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
 import type { z } from "zod";
 import { loans } from "@/db/schemas/loans.schema";
@@ -9,6 +9,7 @@ import * as uploadService from "./upload.service";
 const ADMIN_PERCENTAGE = 0.05;
 const MINIMUM_PRINCIPAL_DEPOSIT = 50000;
 const MONTHLY_DEPOSIT = 5000;
+const LOAN_PERIOD_MONTHS = 6;
 
 export async function getAllMembers({
   where = {},
@@ -197,6 +198,49 @@ export async function calculateNewMemberDeposit(loan: number) {
     principalDeposit: MINIMUM_PRINCIPAL_DEPOSIT,
     mandatoryDeposit,
     voluntaryDeposit,
+  };
+}
+
+export async function calculateExistingMemberDeposit(id: string, loan: number) {
+  const member = await db.query.members.findFirst({
+    where: eq(members.id, id),
+    with: {
+      deposit: {
+        with: {
+          loans: {
+            orderBy: desc(loans.createdAt),
+          },
+        },
+      },
+    },
+  });
+
+  if (!member) {
+    throw new Error("Member not found.");
+  }
+
+  let adminCost = loan * ADMIN_PERCENTAGE;
+
+  const loanCount = member.deposit.loans.length;
+  const shouldBeMandatoryDeposited = loanCount * (MONTHLY_DEPOSIT * LOAN_PERIOD_MONTHS);
+
+  const mandatoryDepositRemaining = Math.max(shouldBeMandatoryDeposited - member.deposit.mandatoryDeposit, 0);
+  if (adminCost < mandatoryDepositRemaining) {
+    throw new Error(
+      `Minimum principal deposit is not met. Minimum loan is ${mandatoryDepositRemaining / ADMIN_PERCENTAGE}.`,
+    );
+  }
+
+  adminCost -= mandatoryDepositRemaining;
+
+  const monthCount = Math.min(Math.floor(adminCost / MONTHLY_DEPOSIT), 6);
+  const mandatoryDeposit = monthCount * MONTHLY_DEPOSIT;
+  const voluntaryDeposit = adminCost - mandatoryDeposit;
+
+  return {
+    principalDeposit: MINIMUM_PRINCIPAL_DEPOSIT,
+    mandatoryDeposit: member.deposit.mandatoryDeposit + mandatoryDeposit,
+    voluntaryDeposit: member.deposit.voluntaryDeposit + voluntaryDeposit,
   };
 }
 

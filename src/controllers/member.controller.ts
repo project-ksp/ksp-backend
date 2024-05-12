@@ -2,6 +2,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import * as branchService from "@/services/branch.service";
 import * as memberService from "@/services/member.service";
 import type {
+  CalculateDepositExistingMemberSchema,
   CalculateDepositMemberSchema,
   CreateLoanMemberSchema,
   IndexMemberSchema,
@@ -202,6 +203,26 @@ export async function calculateDeposit(request: FastifyRequest<CalculateDepositM
 
   try {
     const data = await memberService.calculateNewMemberDeposit(loan);
+    reply.send({
+      message: "Deposit successfully calculated.",
+      data,
+    });
+  } catch (error) {
+    return reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
+}
+
+export async function calculateDepositExisting(
+  request: FastifyRequest<CalculateDepositExistingMemberSchema>,
+  reply: FastifyReply,
+) {
+  const { id } = request.params;
+  const { loan } = request.body;
+
+  try {
+    const data = await memberService.calculateExistingMemberDeposit(id, loan);
     reply.send({
       message: "Deposit successfully calculated.",
       data,

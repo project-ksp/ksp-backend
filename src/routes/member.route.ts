@@ -9,6 +9,7 @@ import {
   updateStatusMemberSchema,
   verifyMemberSchema,
   calculateDepositMemberSchema,
+  calculateDepositExistingMemberSchema,
 } from "@/schemas/member.schema";
 
 const memberRoutes = async (fastify: FastifyInstance) => {
@@ -49,6 +50,11 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     "/calculate-deposit",
     { schema: calculateDepositMemberSchema, preHandler: [fastify.authenticate] },
     memberController.calculateDeposit,
+  );
+  fastify.post(
+    "/:id/calculate-deposit",
+    { schema: calculateDepositExistingMemberSchema, preHandler: [fastify.authenticate] },
+    memberController.calculateDepositExisting,
   );
 };
 

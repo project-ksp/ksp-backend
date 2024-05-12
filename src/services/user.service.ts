@@ -24,6 +24,12 @@ export async function getAllUsers(where: Partial<typeof users.$inferSelect> = {}
   });
 }
 
+export async function getAllUsersInBranch(branchId: number) {
+  return db.query.users.findMany({
+    where: (users, { and, eq, ne }) => and(eq(users.branchId, branchId), ne(users.role, "owner")),
+  });
+}
+
 export async function getUserByID(id: number) {
   const user = await db.query.users.findFirst({
     where: (users, { eq }) => eq(users.id, id),

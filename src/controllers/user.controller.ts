@@ -9,7 +9,7 @@ export async function index(request: FastifyRequest, reply: FastifyReply) {
     data:
       request.user.role === "owner"
         ? await userService.getAllUsers()
-        : await userService.getAllUsers({ branchId: request.user.branchId }),
+        : await userService.getAllUsersInBranch(request.user.branchId),
   });
 }
 

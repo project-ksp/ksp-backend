@@ -4,7 +4,7 @@ import { educationEnum, genderEnum, memberStatusEnum, religionEnum } from "../sc
 
 export default async function memberFactory(): Promise<typeof members.$inferInsert> {
   const member = {
-    id: `0${faker.number.int({ min: 1, max: 2 })}.${faker.string.numeric(2)}.${faker.string.numeric(2)}.${faker.string.numeric(5)}`,
+    id: `0${faker.number.int({ min: 1, max: 2 })}.**.##.${faker.string.numeric(5)}`,
     name: faker.person.fullName(),
     nik: faker.string.numeric(16),
     gender: genderEnum.enumValues[faker.number.int(genderEnum.enumValues.length)] ?? "laki-laki",
@@ -26,6 +26,8 @@ export default async function memberFactory(): Promise<typeof members.$inferInse
 
     status: memberStatusEnum.enumValues[faker.number.int(memberStatusEnum.enumValues.length)] ?? "diproses",
     verified: faker.datatype.boolean(),
+
+    leaderId: "",
   };
 
   return member;

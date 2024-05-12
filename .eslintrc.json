@@ -28,7 +28,7 @@
         ],
         "no-await-in-loop": "off",
         "no-mixed-operators": "off",
-        "operator-linebreak": ["error", "after"]
+        "operator-linebreak": "off"
       }
     }
   ],

@@ -10,7 +10,9 @@ export default async function seed() {
 
   for (let i = 0; i < branches.length; i++) {
     for (let j = 0; j < batch; j++) {
-      Object.assign(leaderData[i * batch + j]!, { branchId: branches[i]!.id });
+      const leader = leaderData[i * batch + j]!;
+      const branchId = branches[i]!.id;
+      Object.assign(leader, { id: leader.id.replace("**", branchId.toString()), branchId });
     }
   }
 

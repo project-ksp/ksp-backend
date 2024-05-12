@@ -11,14 +11,18 @@ export default async function seed() {
   const branchesPerBatch = Math.floor(memberData.length / branches.length);
   for (let i = 0; i < branches.length; i++) {
     for (let j = 0; j < branchesPerBatch; j++) {
-      memberData[i * branchesPerBatch + j]!.branchId = branches[i]!.id;
+      const member = memberData[i * branchesPerBatch + j]!;
+      const branch = branches[i]!;
+      Object.assign(member, { id: member.id.replace("**", branch.id.toString()), branchId: branch.id });
     }
   }
 
   const leadersPerBatch = Math.floor(memberData.length / leaders.length);
   for (let i = 0; i < leaders.length; i++) {
     for (let j = 0; j < leadersPerBatch; j++) {
-      Object.assign(memberData[i * leadersPerBatch + j]!, { leaderId: leaders[i]!.id });
+      const member = memberData[i * leadersPerBatch + j]!;
+      const leader = leaders[i]!;
+      Object.assign(member, { id: member.id.replace("##", leader.id.split(".")[1]!), leaderId: leader.id });
     }
   }
 

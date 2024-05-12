@@ -4,7 +4,7 @@ import { educationEnum, genderEnum, religionEnum } from "../schemas";
 
 export default async function leaderFactory(): Promise<typeof leaders.$inferInsert> {
   return {
-    id: `${faker.string.numeric(2)}.${faker.string.numeric(5)}`,
+    id: `**.${faker.string.numeric(5)}`,
     name: faker.person.fullName(),
     birthPlace: faker.location.city(),
     birthDate: faker.date.birthdate().toISOString().split("T")[0]!,

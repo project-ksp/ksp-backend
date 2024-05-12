@@ -114,13 +114,7 @@ export async function createMemberWithLoan(data: {
   loan: typeof loans.$inferInsert;
 }) {
   const { member, loan } = data;
-
-  if (loan.loan * ADMIN_PERCENTAGE < MINIMUM_PRINCIPAL_DEPOSIT) {
-    throw new Error("Minimum principal deposit is not met.");
-  }
-
-  const voluntaryDeposit = (loan.loan * ADMIN_PERCENTAGE - MINIMUM_PRINCIPAL_DEPOSIT) % MONTHLY_DEPOSIT;
-  const mandatoryDeposit = loan.loan * ADMIN_PERCENTAGE - MINIMUM_PRINCIPAL_DEPOSIT - voluntaryDeposit;
+  const depositValues = await calculateNewMemberDeposit(loan.loan);
 
   const id = await generateId(member);
   member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
@@ -142,9 +136,7 @@ export async function createMemberWithLoan(data: {
         .insert(deposits)
         .values({
           memberId: memberRet.id,
-          principalDeposit: MINIMUM_PRINCIPAL_DEPOSIT,
-          mandatoryDeposit,
-          voluntaryDeposit,
+          ...depositValues,
         })
         .returning();
 
@@ -188,6 +180,24 @@ export async function updateMember(id: string, data: Partial<typeof members.$inf
   }
 
   return member;
+}
+
+export async function calculateNewMemberDeposit(loan: number) {
+  if (loan * ADMIN_PERCENTAGE < MINIMUM_PRINCIPAL_DEPOSIT) {
+    throw new Error(
+      `Minimum principal deposit is not met. Minimum loan is ${MINIMUM_PRINCIPAL_DEPOSIT / ADMIN_PERCENTAGE}.`,
+    );
+  }
+
+  const monthCount = Math.min(Math.floor((loan * ADMIN_PERCENTAGE - MINIMUM_PRINCIPAL_DEPOSIT) / MONTHLY_DEPOSIT), 6);
+  const mandatoryDeposit = monthCount * MONTHLY_DEPOSIT;
+  const voluntaryDeposit = loan * ADMIN_PERCENTAGE - MINIMUM_PRINCIPAL_DEPOSIT - mandatoryDeposit;
+
+  return {
+    principalDeposit: MINIMUM_PRINCIPAL_DEPOSIT,
+    mandatoryDeposit,
+    voluntaryDeposit,
+  };
 }
 
 async function generateId(data: z.infer<typeof insertMemberSchema>) {

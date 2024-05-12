@@ -78,6 +78,16 @@ export const verifyMemberSchema = {
   } as const,
 };
 
+export const calculateDepositMemberSchema = {
+  body: {
+    type: "object",
+    required: ["loan"],
+    properties: {
+      loan: { type: "number" },
+    },
+  } as const,
+};
+
 export type IndexMemberSchema = SchemaToRequestTypes<typeof indexMemberSchema>;
 export type SearchMemberSchema = SchemaToRequestTypes<typeof searchMemberSchema>;
 export type ShowMemberSchema = SchemaToRequestTypes<typeof showMemberSchema>;
@@ -85,3 +95,4 @@ export type CreateLoanMemberSchema = SchemaToRequestTypes<typeof createLoanMembe
 export type UpdateMemberSchema = SchemaToRequestTypes<typeof updateMemberSchema>;
 export type UpdateStatusMemberSchema = SchemaToRequestTypes<typeof updateStatusMemberSchema>;
 export type VerifyMemberSchema = SchemaToRequestTypes<typeof verifyMemberSchema>;
+export type CalculateDepositMemberSchema = SchemaToRequestTypes<typeof calculateDepositMemberSchema>;

@@ -85,4 +85,5 @@ export const updateMemberSchema = createInsertSchema(members).omit({
   status: true,
   verified: true,
   createdAt: true,
+  updatedAt: true,
 });

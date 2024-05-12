@@ -27,13 +27,19 @@ export async function getAllUsers(where: Partial<typeof users.$inferSelect> = {}
 export async function getUserByID(id: number) {
   const user = await db.query.users.findFirst({
     where: (users, { eq }) => eq(users.id, id),
+    with: { branch: { with: { branchHeads: true } } },
   });
   if (!user) {
     throw new Error("User not found");
   }
 
   const { password, ...rest } = user;
-  return rest;
+  if (rest.role !== "owner") {
+    return rest;
+  }
+
+  const { branch, ...nobranch } = rest;
+  return nobranch;
 }
 
 export async function createUser(data: z.infer<typeof userInsertSchema>) {

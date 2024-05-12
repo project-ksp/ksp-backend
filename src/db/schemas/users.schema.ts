@@ -16,8 +16,12 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   members: many(members),
+  branch: one(branches, {
+    fields: [users.branchId],
+    references: [branches.id],
+  }),
 }));
 
 export const userInsertSchema = createInsertSchema(users)

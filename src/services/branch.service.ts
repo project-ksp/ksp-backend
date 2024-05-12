@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { branchHeads, branches, members } from "@/db/schemas";
-import { getTableColumns, eq, sql } from "drizzle-orm";
+import { branchHeads, branches, leaders, members, users } from "@/db/schemas";
+import { getTableColumns, eq, sql, count } from "drizzle-orm";
 
 export async function getAllBranches() {
   const sq = db
@@ -30,7 +30,19 @@ export async function getAllBranches() {
 }
 
 export async function getBranchById(id: number) {
-  return db.query.branches.findFirst({ where: eq(branches.id, id) });
+  const [branch] = await db
+    .select({
+      ...getTableColumns(branches),
+      accountCount: sql<number>`SUM(CASE WHEN ${eq(users.role, "owner")} THEN 0 ELSE 1 END)`.as("accountCount"),
+      leaderCount: count(leaders.id).as("leaderCount"),
+    })
+    .from(branches)
+    .where(eq(branches.id, id))
+    .leftJoin(users, eq(branches.id, users.branchId))
+    .leftJoin(leaders, eq(branches.id, leaders.branchId))
+    .groupBy(branches.id);
+
+  return branch;
 }
 
 export async function createBranch(data: typeof branches.$inferInsert) {

@@ -32,20 +32,24 @@ export async function getAllUsersInBranch(branchId: number) {
 
 export async function getUserByID(id: number) {
   const user = await db.query.users.findFirst({
-    where: (users, { eq }) => eq(users.id, id),
-    with: { branch: { with: { branchHeads: true } } },
+    where: eq(users.id, id),
+    columns: {
+      password: false,
+    },
   });
   if (!user) {
     throw new Error("User not found");
   }
 
-  const { password, ...rest } = user;
-  if (rest.role !== "owner") {
-    return rest;
+  if (user.role === "owner") {
+    return user;
   }
 
-  const { branch, ...nobranch } = rest;
-  return nobranch;
+  const branch = await branchService.getBranchById(user.branchId);
+  return {
+    ...user,
+    branch,
+  };
 }
 
 export async function createUser(data: z.infer<typeof userInsertSchema>) {

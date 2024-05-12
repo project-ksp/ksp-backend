@@ -89,5 +89,5 @@ async function generateId(branchId: number) {
       .where(eq(leaders.branchId, branchId))
   )[0]!;
 
-  return `${branchId.toString().padStart(2, "0")}.${(value + 1).toString().padStart(5, "0")}`;
+  return `${branchId.toString().padStart(2, "0")}.${(value + 1).toString().padStart(2, "0")}`;
 }

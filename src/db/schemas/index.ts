@@ -6,5 +6,4 @@ export * from "./members.schema";
 export * from "./tellers.schema";
 export * from "./leaders.schema";
 export * from "./deposits.schema";
-export * from "./monthlyDeposits.schema";
-export * from "./monthlyLoans.schema";
+export * from "./loans.schema";

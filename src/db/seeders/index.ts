@@ -10,12 +10,10 @@ async function seed() {
     member: await import("./member.seeder"),
     teller: await import("./teller.seeder"),
     deposit: await import("./deposit.seeder"),
-    monthlyDeposit: await import("./monthlyDeposit.seeder"),
-    monthlyLoan: await import("./monthlyLoan.seeder"),
+    loan: await import("./loan.seeder"),
   };
   const deleteOrder: Array<keyof typeof seeders> = [
-    "monthlyLoan",
-    "monthlyDeposit",
+    "loan",
     "deposit",
     "teller",
     "member",

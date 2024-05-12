@@ -1,8 +1,14 @@
 import { db } from "@/db";
-import { members, type insertMemberSchema } from "@/db/schemas";
+import { members, type insertMemberSchema, deposits } from "@/db/schemas";
 import { count, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
 import type { z } from "zod";
+import { loans } from "@/db/schemas/loans.schema";
+import * as uploadService from "./upload.service";
+
+const ADMIN_PERCENTAGE = 0.05,
+  MINIMUM_PRINCIPAL_DEPOSIT = 50000,
+  MONTHLY_DEPOSIT = 5000;
 
 export async function getAllMembers({
   where = {},
@@ -34,41 +40,30 @@ export async function getAllMembers({
           name: true,
         },
       },
-      deposits: {
+      deposit: {
         columns: {
           principalDeposit: true,
+          mandatoryDeposit: true,
           voluntaryDeposit: true,
         },
         with: {
-          monthlyDeposits: {
-            columns: {
-              deposit: true,
-            },
-          },
-          monthlyLoans: {
+          loans: {
             columns: {
               loan: true,
             },
           },
         },
-        orderBy: (deposits, { desc }) => desc(deposits.createdAt),
-        limit: 1,
       },
     },
   });
 
-  data.forEach((member) => {
-    if (member.deposits[0]) {
-      Object.assign(member, {
-        totalDeposit:
-          member.deposits[0].principalDeposit +
-          member.deposits[0].voluntaryDeposit +
-          member.deposits[0].monthlyDeposits.reduce((acc, curr) => acc + curr.deposit, 0),
-        totalLoan: member.deposits[0].monthlyLoans.reduce((acc, curr) => acc + curr.loan, 0),
-        deposits: undefined,
-      });
-    }
-  });
+  data.forEach((member) =>
+    Object.assign(member, {
+      totalDeposit: member.deposit.principalDeposit + member.deposit.mandatoryDeposit + member.deposit.voluntaryDeposit,
+      totalLoan: member.deposit.loans.reduce((acc, loan) => acc + loan.loan, 0),
+      deposit: undefined,
+    }),
+  );
 
   return data;
 }
@@ -105,39 +100,84 @@ export async function getMemberById(id: string) {
           name: true,
         },
       },
-      deposits: {
-        columns: {
-          id: true,
-          principalDeposit: true,
-          voluntaryDeposit: true,
-        },
+      deposit: {
         with: {
-          monthlyDeposits: {
-            columns: {
-              deposit: true,
-            },
-          },
-          monthlyLoans: true,
+          loans: true,
         },
-        orderBy: (deposits, { desc }) => desc(deposits.createdAt),
-        limit: 1,
       },
     },
   });
 }
 
-export async function createMember(data: z.infer<typeof insertMemberSchema>) {
-  const id = await generateId(data);
-  const [member] = await db
-    .insert(members)
-    .values({ id, ...data })
-    .returning();
+export async function createMemberWithLoan(data: {
+  member: Omit<typeof members.$inferInsert, "id">;
+  loan: typeof loans.$inferInsert;
+}) {
+  const { member, loan } = data;
 
-  if (!member) {
-    throw new Error("Failed to create member");
+  if (loan.loan * ADMIN_PERCENTAGE < MINIMUM_PRINCIPAL_DEPOSIT) {
+    throw new Error("Minimum principal deposit is not met.");
   }
 
-  return member;
+  const voluntaryDeposit = (loan.loan * ADMIN_PERCENTAGE - MINIMUM_PRINCIPAL_DEPOSIT) % MONTHLY_DEPOSIT;
+  const mandatoryDeposit = loan.loan * ADMIN_PERCENTAGE - MINIMUM_PRINCIPAL_DEPOSIT - voluntaryDeposit;
+
+  const id = await generateId(member);
+  member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
+  member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
+
+  try {
+    const memberReturned = await db.transaction(async (tx) => {
+      const [memberRet] = await tx
+        .insert(members)
+        .values({ id, ...member })
+        .returning();
+
+      if (!memberRet) {
+        tx.rollback();
+        return;
+      }
+
+      const [depositRet] = await tx
+        .insert(deposits)
+        .values({
+          memberId: memberRet.id,
+          principalDeposit: MINIMUM_PRINCIPAL_DEPOSIT,
+          mandatoryDeposit,
+          voluntaryDeposit,
+        })
+        .returning();
+
+      if (!depositRet) {
+        tx.rollback();
+        return;
+      }
+
+      loan.depositId = depositRet.id;
+      await tx.insert(loans).values(loan);
+
+      return memberRet;
+    });
+
+    if (!memberReturned) {
+      throw new Error("Failed to create member.");
+    }
+
+    return db.query.members.findFirst({
+      where: eq(members.id, memberReturned.id),
+      with: {
+        deposit: {
+          with: {
+            loans: true,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    uploadService.unpersistFile(member.profilePictureUrl);
+    uploadService.unpersistFile(member.idPictureUrl);
+    throw error;
+  }
 }
 
 export async function updateMember(id: string, data: Partial<typeof members.$inferInsert>) {

@@ -45,3 +45,15 @@ export function persistTemporaryFile(name: string) {
   fs.renameSync(source, destination);
   return newName;
 }
+
+export function unpersistFile(name: string) {
+  if (name === placeholderFilename) {
+    return name;
+  }
+
+  const newName = name.replace("uploads/", "");
+  const source = path.join(uploadDir, name);
+  const destination = path.join(tempDir, newName);
+  fs.renameSync(source, destination);
+  return newName;
+}

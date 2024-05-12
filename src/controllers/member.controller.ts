@@ -1,9 +1,8 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import * as branchService from "@/services/branch.service";
 import * as memberService from "@/services/member.service";
-import * as depositService from "@/services/deposit.service";
 import type {
-  CreateMemberSchema,
+  CreateLoanMemberSchema,
   IndexMemberSchema,
   SearchMemberSchema,
   ShowMemberSchema,
@@ -13,11 +12,7 @@ import type {
 } from "@/schemas/member.schema";
 import { insertMemberSchema, updateMemberSchema } from "@/db/schemas";
 import { fromError } from "zod-validation-error";
-import { insertDepositSchema } from "@/db/schemas/deposits.schema";
-import { z } from "zod";
-import { insertMonthlyDepositSchema } from "@/db/schemas/monthlyDeposits.schema";
-import { db } from "@/db";
-import { insertMonthlyLoanSchema } from "@/db/schemas/monthlyLoans.schema";
+import { insertLoanSchema } from "@/db/schemas/loans.schema";
 
 export async function index(request: FastifyRequest<IndexMemberSchema>, reply: FastifyReply) {
   const { page } = request.query;
@@ -105,75 +100,37 @@ export async function show(request: FastifyRequest<ShowMemberSchema>, reply: Fas
   });
 }
 
-export async function create(request: FastifyRequest<CreateMemberSchema>, reply: FastifyReply) {
-  const validatedMember = insertMemberSchema.safeParse(request.body.member);
+export async function createWithLoan(request: FastifyRequest<CreateLoanMemberSchema>, reply: FastifyReply) {
+  const { member, loan } = request.body;
+
+  const validatedMember = insertMemberSchema.safeParse(member);
   if (!validatedMember.success) {
     return reply.status(400).send({
       message: fromError(validatedMember.error).toString(),
     });
   }
 
-  const validatedDeposit = insertDepositSchema.safeParse(request.body.deposit);
-  if (!validatedDeposit.success) {
+  const validatedLoan = insertLoanSchema.safeParse(loan);
+  if (!validatedLoan.success) {
     return reply.status(400).send({
-      message: fromError(validatedDeposit.error).toString(),
+      message: fromError(validatedLoan.error).toString(),
     });
   }
 
-  Object.assign(validatedMember.data, { branchId: request.user.branchId, userId: request.user.id });
-  const member = await memberService.createMember(validatedMember.data);
-
-  Object.assign(validatedDeposit.data, { memberId: member.id });
-  const deposit = await depositService.createDeposit(validatedDeposit.data);
-
-  if (request.body.monthlyDeposits) {
-    const validatedMonthlyDeposits = z.array(insertMonthlyDepositSchema).safeParse(request.body.monthlyDeposits);
-    if (!validatedMonthlyDeposits.success) {
-      return reply.status(400).send({
-        message: fromError(validatedMonthlyDeposits.error).toString(),
-      });
-    }
-
-    const { data } = validatedMonthlyDeposits;
-    await Promise.all(
-      data.map(async (monthlyDeposit) => {
-        Object.assign(monthlyDeposit, { depositId: deposit.id });
-      }),
-    );
-    depositService.createMonthlyDeposits(data);
+  try {
+    const memberRet = await memberService.createMemberWithLoan({
+      member: { ...validatedMember.data, userId: request.user.id },
+      loan: validatedLoan.data,
+    });
+    reply.send({
+      message: "Member successfully created.",
+      data: memberRet,
+    });
+  } catch (error) {
+    return reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
   }
-
-  if (request.body.monthlyLoans) {
-    const validatedMonthlyLoans = z.array(insertMonthlyLoanSchema).safeParse(request.body.monthlyLoans);
-    if (!validatedMonthlyLoans.success) {
-      return reply.status(400).send({
-        message: fromError(validatedMonthlyLoans.error).toString(),
-      });
-    }
-
-    const { data } = validatedMonthlyLoans;
-    await Promise.all(
-      data.map(async (monthlyLoan) => {
-        Object.assign(monthlyLoan, { depositId: deposit.id });
-      }),
-    );
-    depositService.createMonthlyLoans(data);
-  }
-
-  reply.send({
-    message: "Deposit successfully created.",
-    data: await db.query.members.findFirst({
-      with: {
-        deposits: {
-          with: {
-            monthlyDeposits: true,
-            monthlyLoans: true,
-          },
-        },
-      },
-      where: (members, { eq }) => eq(members.id, member.id),
-    }),
-  });
 }
 
 export async function update(request: FastifyRequest<UpdateMemberSchema>, reply: FastifyReply) {
@@ -186,11 +143,17 @@ export async function update(request: FastifyRequest<UpdateMemberSchema>, reply:
     });
   }
 
-  const member = await memberService.updateMember(id, validated.data);
-  reply.send({
-    message: "Member successfully updated.",
-    data: member,
-  });
+  try {
+    const member = await memberService.updateMember(id, validated.data);
+    reply.send({
+      message: "Member successfully updated.",
+      data: member,
+    });
+  } catch (error) {
+    return reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
 }
 
 export async function updateStatus(request: FastifyRequest<UpdateStatusMemberSchema>, reply: FastifyReply) {

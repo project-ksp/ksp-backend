@@ -42,7 +42,7 @@ export const members = pgTable("members", {
   verified: boolean("verified").notNull().default(false),
 });
 
-export const membersRelations = relations(members, ({ one, many }) => ({
+export const membersRelations = relations(members, ({ one }) => ({
   branch: one(branches, {
     fields: [members.branchId],
     references: [branches.id],
@@ -55,7 +55,10 @@ export const membersRelations = relations(members, ({ one, many }) => ({
     fields: [members.userId],
     references: [users.id],
   }),
-  deposits: many(deposits),
+  deposit: one(deposits, {
+    fields: [members.id],
+    references: [deposits.memberId],
+  }),
 }));
 
 export const insertMemberSchema = createInsertSchema(members)

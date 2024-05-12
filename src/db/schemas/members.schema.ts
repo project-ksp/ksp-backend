@@ -77,7 +77,12 @@ export const insertMemberSchema = createInsertSchema(members)
   );
 
 export const updateMemberSchema = createInsertSchema(members).omit({
+  id: true,
+  branchId: true,
+  leaderId: true,
   profilePictureUrl: true,
   idPictureUrl: true,
+  status: true,
+  verified: true,
   createdAt: true,
 });

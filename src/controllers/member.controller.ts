@@ -7,10 +7,11 @@ import type {
   IndexMemberSchema,
   SearchMemberSchema,
   ShowMemberSchema,
+  UpdateMemberSchema,
   UpdateStatusMemberSchema,
   VerifyMemberSchema,
 } from "@/schemas/member.schema";
-import { insertMemberSchema } from "@/db/schemas";
+import { insertMemberSchema, updateMemberSchema } from "@/db/schemas";
 import { fromError } from "zod-validation-error";
 import { insertDepositSchema } from "@/db/schemas/deposits.schema";
 import { z } from "zod";
@@ -172,6 +173,23 @@ export async function create(request: FastifyRequest<CreateMemberSchema>, reply:
       },
       where: (members, { eq }) => eq(members.id, member.id),
     }),
+  });
+}
+
+export async function update(request: FastifyRequest<UpdateMemberSchema>, reply: FastifyReply) {
+  const { id } = request.params;
+  const validated = updateMemberSchema.safeParse(request.body);
+
+  if (!validated.success) {
+    return reply.status(400).send({
+      message: fromError(validated.error).toString(),
+    });
+  }
+
+  const member = await memberService.updateMember(id, validated.data);
+  reply.send({
+    message: "Member successfully updated.",
+    data: member,
   });
 }
 

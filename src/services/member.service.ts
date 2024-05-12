@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { members, type insertMemberSchema, type updateMemberSchema } from "@/db/schemas";
+import { members, type insertMemberSchema } from "@/db/schemas";
 import { count, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
 import type { z } from "zod";
@@ -140,7 +140,7 @@ export async function createMember(data: z.infer<typeof insertMemberSchema>) {
   return member;
 }
 
-export async function updateMember(id: string, data: Partial<z.infer<typeof updateMemberSchema>>) {
+export async function updateMember(id: string, data: Partial<typeof members.$inferInsert>) {
   data.updatedAt = new Date();
   const [member] = await db.update(members).set(data).where(eq(members.id, id)).returning();
   if (!member) {

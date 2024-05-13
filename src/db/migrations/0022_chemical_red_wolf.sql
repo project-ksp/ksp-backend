@@ -1,0 +1,1 @@
+ALTER TABLE "monthly_loans" DROP COLUMN IF EXISTS "month";

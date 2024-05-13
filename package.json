@@ -12,6 +12,7 @@
     "prettier": "prettier --write .",
     "migrate": "drizzle-kit generate:pg",
     "seed": "tsx ./src/db/seeders/index.ts",
+    "seed:clear": "tsx ./src/db/seeders/index.ts --clear",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "start": "node dist/index.js"
   },
@@ -49,6 +50,7 @@
     "fastify-plugin": "^4.5.1",
     "fastify-zod": "^1.4.0",
     "mime-types": "^2.1.35",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.11.3",
     "redis": "^4.6.11",
     "tsc": "^2.0.4",

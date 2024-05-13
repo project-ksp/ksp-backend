@@ -3,8 +3,14 @@ import * as userService from "@/services/user.service";
 import { userInsertSchema } from "@/db/schemas";
 import { fromError } from "zod-validation-error";
 
-export async function index(_request: FastifyRequest, reply: FastifyReply) {
-  reply.send({ message: "User successfully fetched", data: await userService.getAllUsers() });
+export async function index(request: FastifyRequest, reply: FastifyReply) {
+  reply.send({
+    message: "User successfully fetched",
+    data:
+      request.user.role === "owner"
+        ? await userService.getAllUsers()
+        : await userService.getAllUsersInBranch(request.user.branchId),
+  });
 }
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {

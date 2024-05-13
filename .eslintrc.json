@@ -27,7 +27,8 @@
           }
         ],
         "no-await-in-loop": "off",
-        "no-mixed-operators": "off"
+        "no-mixed-operators": "off",
+        "operator-linebreak": "off"
       }
     }
   ],

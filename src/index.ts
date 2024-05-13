@@ -1,6 +1,6 @@
 import fastify from "fastify";
 import { initDb } from "@/db";
-import { env, Logger, Redis } from "@/utils";
+import { env, Logger } from "@/utils";
 import { middleware } from "@/modules/middleware";
 import path from "path";
 
@@ -13,7 +13,7 @@ export const main = async () => {
   });
 
   await initDb();
-  await Redis.initialize();
+  // Disabled for now: await Redis.initialize();
 
   server.register(middleware);
 
@@ -40,7 +40,7 @@ export const main = async () => {
 
   server.register(import("@fastify/static"), {
     root: path.join(__dirname, "storage/public"),
-    prefix: "/public/",
+    prefix: `/${API_VERSION}/public/`,
   });
 
   server.register(import("@/routes"), {

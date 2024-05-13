@@ -1,11 +1,11 @@
 import type SchemaToRequestTypes from ".";
 
 export const updateBranchPublishSchema = {
-  querystring: {
+  params: {
     type: "object",
     required: ["id"],
     properties: {
-      id: { type: "number" },
+      id: { type: "number", minimum: 1 },
     },
   } as const,
   body: {

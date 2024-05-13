@@ -17,9 +17,15 @@ export async function storeTemporaryImage(request: FastifyRequest, reply: Fastif
     return;
   }
 
-  const name = await uploadService.storeTemporary(file);
-  reply.send({
-    message: "File uploaded successfully",
-    data: name,
-  });
+  try {
+    const name = await uploadService.storeTemporary(file);
+    reply.send({
+      message: "File uploaded successfully",
+      data: name,
+    });
+  } catch (error) {
+    reply.code(400).send({
+      message: error instanceof Error ? error.message : "Failed to upload file",
+    });
+  }
 }

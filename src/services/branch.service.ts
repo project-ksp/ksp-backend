@@ -1,13 +1,13 @@
 import { db } from "@/db";
-import { branchHeads, branches, members } from "@/db/schemas";
-import { getTableColumns, eq, sql, sum } from "drizzle-orm";
+import { branchHeads, branches, leaders, members, users } from "@/db/schemas";
+import { getTableColumns, eq, sql, count } from "drizzle-orm";
 
 export async function getAllBranches() {
   const sq = db
     .select({
       branchId: members.branchId,
-      totalLoanSum: sum(members.totalLoan).as("totalLoanSum"),
-      totalSavingSum: sum(members.totalSaving).as("totalSavingSum"),
+      totalLoanSum: sql<number>`0`.as("totalLoanSum"),
+      totalSavingSum: sql<number>`0`.as("totalSavingSum"),
       activeCount: sql<number>`SUM(CASE WHEN ${members.isActive} = true THEN 1 ELSE 0 END)`.as("activeCount"),
       inactiveCount: sql<number>`SUM(CASE WHEN ${members.isActive} = false THEN 1 ELSE 0 END)`.as("inactiveCount"),
     })
@@ -27,6 +27,22 @@ export async function getAllBranches() {
     .from(branches)
     .leftJoin(sq, eq(branches.id, sq.branchId))
     .leftJoin(branchHeads, eq(branches.id, branchHeads.branchId));
+}
+
+export async function getBranchById(id: number) {
+  const [branch] = await db
+    .select({
+      ...getTableColumns(branches),
+      accountCount: sql<number>`SUM(CASE WHEN ${eq(users.role, "owner")} THEN 0 ELSE 1 END)`.as("accountCount"),
+      leaderCount: count(leaders.id).as("leaderCount"),
+    })
+    .from(branches)
+    .where(eq(branches.id, id))
+    .leftJoin(users, eq(branches.id, users.branchId))
+    .leftJoin(leaders, eq(branches.id, leaders.branchId))
+    .groupBy(branches.id);
+
+  return branch;
 }
 
 export async function createBranch(data: typeof branches.$inferInsert) {

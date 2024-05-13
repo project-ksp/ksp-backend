@@ -1,4 +1,4 @@
-import { UpdateStatusLoanSchema, VerifyLoanSchema } from "@/schemas/loan.schema";
+import type { UpdateStatusLoanSchema, VerifyLoanSchema } from "@/schemas/loan.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import * as loanService from "@/services/loan.service";
 

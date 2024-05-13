@@ -199,7 +199,7 @@ export async function addLoanToMember(id: string, data: typeof loans.$inferInser
     }
 
     await tx.insert(loans).values(data);
-    return await db.query.members.findFirst({
+    return db.query.members.findFirst({
       where: eq(members.id, id),
       with: {
         deposit: {

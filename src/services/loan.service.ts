@@ -39,9 +39,11 @@ export async function verifyLoan(id: number) {
   if (!loan) {
     throw new Error("Loan not found.");
   }
+
   if (loan.status !== "disetujui") {
     throw new Error("Loan not approved yet.");
   }
+
   if (loan.verified) {
     throw new Error("Loan already verified.");
   }
@@ -53,7 +55,7 @@ export async function verifyLoan(id: number) {
       .where(eq(deposits.id, loan.depositId));
     await tx.update(loans).set({ verified: true }).where(eq(loans.id, id));
 
-    return await db.query.loans.findFirst({
+    return db.query.loans.findFirst({
       where: eq(loans.id, id),
       with: {
         deposit: true,

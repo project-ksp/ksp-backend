@@ -1,10 +1,10 @@
 import { db } from "@/db";
-import { members, deposits, addDepositSchema } from "@/db/schemas";
+import { members, deposits, type addDepositSchema } from "@/db/schemas";
 import { count, desc, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
 import { loans } from "@/db/schemas/loans.schema";
 import * as uploadService from "./upload.service";
-import { z } from "zod";
+import type { z } from "zod";
 
 const ADMIN_PERCENTAGE = 0.05;
 const MINIMUM_PRINCIPAL_DEPOSIT = 50000;
@@ -107,7 +107,7 @@ export async function getMemberById(id: string) {
         },
       },
     },
-  })!;
+  });
 }
 
 export async function createMemberWithDeposit(data: {

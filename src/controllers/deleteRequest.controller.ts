@@ -1,4 +1,4 @@
-import {
+import type {
   CreateDeleteRequestSchema,
   RemoveDeleteRequestSchema,
   UpdateStatusDeleteRequestSchema,

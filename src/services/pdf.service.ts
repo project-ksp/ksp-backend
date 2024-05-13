@@ -96,6 +96,38 @@ export async function generateDepositForm(id: string) {
   return pdfBytes;
 }
 
+export async function generateLoanForm(id: string) {
+  const member = await memberService.getMemberById(id);
+  if (!member) {
+    throw new Error("Member not found.");
+  }
+
+  const buffer = await readDocument("Blanko Pinjaman.pdf");
+
+  const pdfDoc = await PDFDocument.load(buffer);
+  const helveticaFont = await pdfDoc.embedFont(TEXT_FONT);
+
+  const page = pdfDoc.getPages()[0]!;
+  const { height } = page.getSize();
+
+  page.drawText(member.id, {
+    x: 186,
+    y: height - 101,
+    size: 14,
+    font: helveticaFont,
+  });
+
+  page.drawText(member.name, {
+    x: 186,
+    y: height - 119,
+    size: 14,
+    font: helveticaFont,
+  });
+
+  const pdfBytes = await pdfDoc.save();
+  return pdfBytes;
+}
+
 async function readDocument(name: string) {
   try {
     return fs.readFileSync(path.join(DOCUMENTS_DIRECTORY, name));

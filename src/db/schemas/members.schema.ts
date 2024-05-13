@@ -64,6 +64,8 @@ export const membersRelations = relations(members, ({ one }) => ({
 export const insertMemberSchema = createInsertSchema(members)
   .omit({
     id: true,
+    status: true,
+    verified: true,
     createdAt: true,
     updatedAt: true,
   })

@@ -57,3 +57,12 @@ export function unpersistFile(name: string) {
   fs.renameSync(source, destination);
   return newName;
 }
+
+export function unlinkFile(name: string) {
+  if (name === placeholderFilename) {
+    return;
+  }
+
+  const location = path.join(uploadDir, name);
+  fs.unlinkSync(location);
+}

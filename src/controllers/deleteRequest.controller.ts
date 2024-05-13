@@ -1,0 +1,48 @@
+import {
+  CreateDeleteRequestSchema,
+  RemoveDeleteRequestSchema,
+  UpdateStatusDeleteRequestSchema,
+} from "@/schemas/deleteRequest.schema";
+import type { FastifyReply, FastifyRequest } from "fastify";
+import * as deleteRequestService from "@/services/deleteRequest.service";
+
+export async function create(request: FastifyRequest<CreateDeleteRequestSchema>, reply: FastifyReply) {
+  try {
+    const data = await deleteRequestService.createRequest(request.body);
+    reply.send({
+      message: "Delete request created successfully.",
+      data,
+    });
+  } catch (error) {
+    reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
+}
+
+export async function updateStatus(request: FastifyRequest<UpdateStatusDeleteRequestSchema>, reply: FastifyReply) {
+  try {
+    const data = await deleteRequestService.updateStatus(request.params.id, request.body.status);
+    reply.send({
+      message: "Delete request status updated successfully.",
+      data,
+    });
+  } catch (error) {
+    reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
+}
+
+export async function remove(request: FastifyRequest<RemoveDeleteRequestSchema>, reply: FastifyReply) {
+  try {
+    await deleteRequestService.deleteMember(request.params.id);
+    reply.send({
+      message: "Member removed successfully.",
+    });
+  } catch (error) {
+    reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
+}

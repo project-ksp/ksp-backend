@@ -11,7 +11,7 @@ export const deposits = pgTable("deposits", {
   voluntaryDeposit: bigint("voluntary_deposits", { mode: "number" }).notNull(),
   memberId: varchar("member_id", { length: 32 })
     .notNull()
-    .references(() => members.id),
+    .references(() => members.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

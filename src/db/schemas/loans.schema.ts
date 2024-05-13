@@ -11,7 +11,7 @@ export const loans = pgTable("loans", {
   loan: bigint("loan", { mode: "number" }).notNull(),
   depositId: serial("deposit_id")
     .notNull()
-    .references(() => deposits.id),
+    .references(() => deposits.id, { onDelete: "cascade" }),
   leaderId: varchar("leader_id", { length: 32 })
     .notNull()
     .references(() => leaders.id),

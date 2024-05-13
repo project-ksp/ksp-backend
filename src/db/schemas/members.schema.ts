@@ -7,6 +7,7 @@ import { users } from "./users.schema";
 import { createInsertSchema } from "drizzle-zod";
 import { deposits } from "./deposits.schema";
 import * as uploadService from "@/services/upload.service";
+import { deleteRequests } from "./deleteRequests.schema";
 
 export const members = pgTable("members", {
   id: varchar("id", { length: 32 }).primaryKey(),
@@ -58,6 +59,10 @@ export const membersRelations = relations(members, ({ one }) => ({
   deposit: one(deposits, {
     fields: [members.id],
     references: [deposits.memberId],
+  }),
+  deleteRequests: one(deleteRequests, {
+    fields: [members.id],
+    references: [deleteRequests.memberId],
   }),
 }));
 

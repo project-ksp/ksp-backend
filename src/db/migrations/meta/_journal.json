@@ -176,6 +176,13 @@
       "when": 1715595595851,
       "tag": "0024_solid_thor",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1715599725655,
+      "tag": "0025_superb_slapstick",
+      "breakpoints": true
     }
   ]
 }

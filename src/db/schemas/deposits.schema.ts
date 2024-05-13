@@ -9,13 +9,15 @@ export const deposits = pgTable("deposits", {
   principalDeposit: bigint("principal_deposits", { mode: "number" }).notNull(),
   mandatoryDeposit: bigint("mandatory_deposits", { mode: "number" }).notNull(),
   voluntaryDeposit: bigint("voluntary_deposits", { mode: "number" }).notNull(),
-  memberId: varchar("member_id", { length: 32 }).references(() => members.id),
+  memberId: varchar("member_id", { length: 32 })
+    .notNull()
+    .references(() => members.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const depositsRelations = relations(deposits, ({ one, many }) => ({
-  members: one(members, {
+  member: one(members, {
     fields: [deposits.memberId],
     references: [members.id],
   }),

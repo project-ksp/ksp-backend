@@ -66,6 +66,7 @@ export const insertMemberSchema = createInsertSchema(members)
     id: true,
     status: true,
     verified: true,
+    branchId: true,
     createdAt: true,
     updatedAt: true,
   })

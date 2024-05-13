@@ -2,6 +2,7 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import * as branchService from "@/services/branch.service";
 import * as memberService from "@/services/member.service";
 import type {
+  AddLoanMemberSchema,
   CalculateDepositExistingMemberSchema,
   CalculateDepositMemberSchema,
   CreateLoanMemberSchema,
@@ -14,7 +15,7 @@ import type {
 } from "@/schemas/member.schema";
 import { insertMemberSchema, updateMemberSchema } from "@/db/schemas";
 import { fromError } from "zod-validation-error";
-import { insertLoanSchema } from "@/db/schemas/loans.schema";
+import { addLoanSchema, insertLoanSchema } from "@/db/schemas/loans.schema";
 
 export async function index(request: FastifyRequest<IndexMemberSchema>, reply: FastifyReply) {
   const { page } = request.query;
@@ -121,8 +122,8 @@ export async function createWithLoan(request: FastifyRequest<CreateLoanMemberSch
 
   try {
     const memberRet = await memberService.createMemberWithLoan({
-      member: { ...validatedMember.data, userId: request.user.id },
-      loan: validatedLoan.data,
+      member: { ...validatedMember.data, branchId: request.user.branchId, userId: request.user.id },
+      loan: { ...validatedLoan.data, branchId: request.user.branchId },
     });
     reply.send({
       message: "Member successfully created.",
@@ -189,6 +190,28 @@ export async function verify(request: FastifyRequest<VerifyMemberSchema>, reply:
     const data = await memberService.updateMember(id, { verified: true });
     reply.send({
       message: "Member successfully verified.",
+      data,
+    });
+  } catch (error) {
+    return reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
+}
+
+export async function addLoan(request: FastifyRequest<AddLoanMemberSchema>, reply: FastifyReply) {
+  const { id } = request.params;
+  const validated = addLoanSchema.safeParse(request.body);
+  if (!validated.success) {
+    return reply.status(400).send({
+      message: fromError(validated.error).toString(),
+    });
+  }
+
+  try {
+    const data = await memberService.addLoanToMember(id, validated.data);
+    reply.send({
+      message: "Loan successfully added to member.",
       data,
     });
   } catch (error) {

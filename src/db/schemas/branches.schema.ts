@@ -5,6 +5,7 @@ import { branchHeads } from "./branchHeads.schema";
 import { members } from "./members.schema";
 import { tellers } from "./tellers.schema";
 import { users } from "./users.schema";
+import { loans } from "./loans.schema";
 
 export const branches = pgTable("branches", {
   id: serial("id").primaryKey(),
@@ -23,6 +24,7 @@ export const branchesRelations = relations(branches, ({ many }) => ({
   members: many(members),
   tellers: many(tellers),
   users: many(users),
+  loans: many(loans),
 }));
 
 export const insertBranchSchema = createInsertSchema(branches);

@@ -10,6 +10,7 @@ import {
   verifyMemberSchema,
   calculateDepositMemberSchema,
   calculateDepositExistingMemberSchema,
+  addLoanMemberSchema,
 } from "@/schemas/member.schema";
 
 const memberRoutes = async (fastify: FastifyInstance) => {
@@ -45,6 +46,11 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     "/:id/verify",
     { schema: verifyMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
     memberController.verify,
+  );
+  fastify.post(
+    "/:id/loan",
+    { schema: addLoanMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
+    memberController.addLoan,
   );
   fastify.post(
     "/calculate-deposit",

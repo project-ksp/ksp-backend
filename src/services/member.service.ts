@@ -1,8 +1,7 @@
 import { db } from "@/db";
-import { members, type insertMemberSchema, deposits } from "@/db/schemas";
+import { members, deposits } from "@/db/schemas";
 import { count, desc, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
-import type { z } from "zod";
 import { loans } from "@/db/schemas/loans.schema";
 import * as uploadService from "./upload.service";
 
@@ -174,6 +173,50 @@ export async function createMemberWithLoan(data: {
   }
 }
 
+export async function addLoanToMember(id: string, data: typeof loans.$inferInsert) {
+  const member = await db.query.members.findFirst({
+    where: eq(members.id, id),
+    with: {
+      deposit: {
+        with: {
+          loans: {
+            orderBy: desc(loans.createdAt),
+          },
+        },
+      },
+    },
+  });
+  if (!member) {
+    throw new Error("Member not found.");
+  }
+
+  await calculateExistingMemberDeposit(id, data.loan);
+  data.depositId = member.deposit.id;
+
+  const memberTx = await db.transaction(async (tx) => {
+    if (member.deposit.loans[0] && !member.deposit.loans[0].verified) {
+      await tx.delete(loans).where(eq(loans.id, member.deposit.loans[0].id));
+    }
+
+    await tx.insert(loans).values(data);
+    return await db.query.members.findFirst({
+      where: eq(members.id, id),
+      with: {
+        deposit: {
+          with: {
+            loans: true,
+          },
+        },
+      },
+    });
+  });
+  if (!memberTx) {
+    throw new Error("Failed to add loan to member.");
+  }
+
+  return memberTx;
+}
+
 export async function updateMember(id: string, data: Partial<typeof members.$inferInsert>) {
   data.updatedAt = new Date();
   const [member] = await db.update(members).set(data).where(eq(members.id, id)).returning();
@@ -222,7 +265,11 @@ export async function calculateExistingMemberDeposit(id: string, loan: number) {
 
   const adminCost = loan * ADMIN_PERCENTAGE;
 
-  const loanCount = member.deposit.loans.length;
+  const loanCount =
+    member.deposit.loans[0] && !member.deposit.loans[0].verified
+      ? member.deposit.loans.length - 1
+      : member.deposit.loans.length;
+
   const shouldBeMandatoryDeposited = loanCount * (MONTHLY_DEPOSIT * LOAN_PERIOD_MONTHS);
 
   const mandatoryDepositRemaining = Math.max(shouldBeMandatoryDeposited - member.deposit.mandatoryDeposit, 0);
@@ -247,7 +294,7 @@ export async function calculateExistingMemberDeposit(id: string, loan: number) {
   };
 }
 
-async function generateId(data: z.infer<typeof insertMemberSchema>) {
+async function generateId(data: Omit<typeof members.$inferInsert, "id">) {
   const { branchId, leaderId } = data;
 
   const { value } = (

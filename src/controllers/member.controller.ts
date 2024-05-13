@@ -81,7 +81,7 @@ export async function search(request: FastifyRequest<SearchMemberSchema>, reply:
   try {
     const data = await memberService.getAllMembers({
       where: { branchId: request.user.branchId, verified: true },
-      query: { id: query, name: query },
+      query: { id: query },
     });
     reply.send({
       message: "Members successfully fetched.",

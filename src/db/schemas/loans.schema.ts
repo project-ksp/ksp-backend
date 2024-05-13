@@ -1,4 +1,4 @@
-import { bigint, pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import { bigint, boolean, pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
 import { deposits } from "./deposits.schema";
 import { relations } from "drizzle-orm";
 import { leaders } from "./leaders.schema";
@@ -13,6 +13,7 @@ export const loans = pgTable("loans", {
   leaderId: varchar("leader_id", { length: 32 })
     .notNull()
     .references(() => leaders.id),
+  verified: boolean("verified").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -28,6 +29,7 @@ export const loansRelations = relations(loans, ({ one }) => ({
 }));
 
 export const insertLoanSchema = createInsertSchema(loans).omit({
+  verified: true,
   depositId: true,
   createdAt: true,
 });

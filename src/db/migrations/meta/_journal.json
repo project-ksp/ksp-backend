@@ -169,6 +169,13 @@
       "when": 1715523240520,
       "tag": "0023_certain_madame_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1715595595851,
+      "tag": "0024_solid_thor",
+      "breakpoints": true
     }
   ]
 }

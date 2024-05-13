@@ -147,6 +147,7 @@ export async function createMemberWithLoan(data: {
       }
 
       loan.depositId = depositRet.id;
+      loan.verified = true;
       await tx.insert(loans).values(loan);
 
       return memberRet;
@@ -219,7 +220,7 @@ export async function calculateExistingMemberDeposit(id: string, loan: number) {
     throw new Error("Member not found.");
   }
 
-  let adminCost = loan * ADMIN_PERCENTAGE;
+  const adminCost = loan * ADMIN_PERCENTAGE;
 
   const loanCount = member.deposit.loans.length;
   const shouldBeMandatoryDeposited = loanCount * (MONTHLY_DEPOSIT * LOAN_PERIOD_MONTHS);
@@ -231,11 +232,13 @@ export async function calculateExistingMemberDeposit(id: string, loan: number) {
     );
   }
 
-  adminCost -= mandatoryDepositRemaining;
+  const shouldBeMandatoryDepositedAfter = (loanCount + 1) * (MONTHLY_DEPOSIT * LOAN_PERIOD_MONTHS);
+  const mandatoryDepositRemainingAfter = Math.max(shouldBeMandatoryDepositedAfter - member.deposit.mandatoryDeposit, 0);
 
-  const monthCount = Math.min(Math.floor(adminCost / MONTHLY_DEPOSIT), 6);
-  const mandatoryDeposit = monthCount * MONTHLY_DEPOSIT;
-  const voluntaryDeposit = adminCost - mandatoryDeposit;
+  const ableToDeposit = Math.min(adminCost, mandatoryDepositRemainingAfter);
+
+  const mandatoryDeposit = ableToDeposit;
+  const voluntaryDeposit = adminCost - ableToDeposit;
 
   return {
     principalDeposit: MINIMUM_PRINCIPAL_DEPOSIT,

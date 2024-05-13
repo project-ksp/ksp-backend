@@ -4,12 +4,25 @@ import { and, eq } from "drizzle-orm";
 import * as memberService from "./member.service";
 
 export async function getAllLoans({ where = {} }: { where?: Partial<typeof loans.$inferSelect> }) {
-  return db.query.members.findMany({
+  return db.query.loans.findMany({
+    columns: {
+      id: true,
+      loan: true,
+      status: true,
+    },
     where: and(...Object.entries(where).map(([key, value]) => eq(loans[key as keyof typeof where], value!))),
     with: {
       deposit: {
+        columns: {},
         with: {
-          member: true,
+          member: {
+            columns: {
+              id: true,
+              name: true,
+              nik: true,
+              gender: true,
+            },
+          },
         },
       },
     },

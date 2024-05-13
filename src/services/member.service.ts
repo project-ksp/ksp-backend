@@ -177,7 +177,6 @@ export async function createMemberWithLoan(data: {
   const depositValues = await calculateNewMemberDeposit(loan.loan);
 
   const id = await generateId(member);
-  console.log(id);
   member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
   member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
 

@@ -342,3 +342,9 @@ export async function getLoanForm(request: FastifyRequest<MemberIdParamSchema>, 
   reply.header("Content-Type", "application/pdf");
   reply.send(stream);
 }
+
+export async function getRegistrationForm(request: FastifyRequest<MemberIdParamSchema>, reply: FastifyReply) {
+  const stream = await pdfService.generateRegistrationForm(request.params.id);
+  reply.header("Content-Type", "application/pdf");
+  reply.send(stream);
+}

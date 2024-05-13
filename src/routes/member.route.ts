@@ -94,6 +94,11 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     { schema: memberIdParamSchema, preHandler: [fastify.authenticate] },
     memberController.getLoanForm,
   );
+  fastify.get(
+    "/:id/registration-form",
+    { schema: memberIdParamSchema, preHandler: [fastify.authenticate] },
+    memberController.getRegistrationForm,
+  );
 };
 
 export default memberRoutes;

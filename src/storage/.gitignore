@@ -1,2 +1,4 @@
-*/*
-!public/placeholder.png
+public/uploads/*
+!public/uploads/.gitkeep
+tmp/*
+!tmp/.gitkeep

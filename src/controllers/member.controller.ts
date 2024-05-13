@@ -1,12 +1,14 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import * as branchService from "@/services/branch.service";
 import * as memberService from "@/services/member.service";
+import * as pdfService from "@/services/pdf.service";
 import type {
   AddLoanMemberSchema,
   CalculateDepositExistingMemberSchema,
   CalculateDepositMemberSchema,
   CreateDepositMemberSchema,
   CreateLoanMemberSchema,
+  GetCardMemberSchema,
   IndexMemberSchema,
   SearchMemberSchema,
   ShowMemberSchema,
@@ -321,4 +323,10 @@ export async function calculateDepositExisting(
       message: error instanceof Error ? error.message : "An error occurred.",
     });
   }
+}
+
+export async function getCard(request: FastifyRequest<GetCardMemberSchema>, reply: FastifyReply) {
+  const stream = await pdfService.generateMemberCard(request.params.id);
+  reply.header("Content-Type", "application/pdf");
+  reply.send(stream);
 }

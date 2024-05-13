@@ -126,6 +126,16 @@ export const calculateDepositExistingMemberSchema = {
   } as const,
 };
 
+export const getCardMemberSchema = {
+  params: {
+    type: "object",
+    required: ["id"],
+    properties: {
+      id: { type: "string" },
+    },
+  } as const,
+};
+
 export type IndexMemberSchema = SchemaToRequestTypes<typeof indexMemberSchema>;
 export type SearchMemberSchema = SchemaToRequestTypes<typeof searchMemberSchema>;
 export type ShowMemberSchema = SchemaToRequestTypes<typeof showMemberSchema>;
@@ -137,3 +147,4 @@ export type UpdateStatusMemberSchema = SchemaToRequestTypes<typeof updateStatusM
 export type VerifyMemberSchema = SchemaToRequestTypes<typeof verifyMemberSchema>;
 export type CalculateDepositMemberSchema = SchemaToRequestTypes<typeof calculateDepositMemberSchema>;
 export type CalculateDepositExistingMemberSchema = SchemaToRequestTypes<typeof calculateDepositExistingMemberSchema>;
+export type GetCardMemberSchema = SchemaToRequestTypes<typeof getCardMemberSchema>;

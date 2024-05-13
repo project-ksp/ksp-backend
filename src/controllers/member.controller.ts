@@ -8,7 +8,7 @@ import type {
   CalculateDepositMemberSchema,
   CreateDepositMemberSchema,
   CreateLoanMemberSchema,
-  GetCardMemberSchema,
+  MemberIdParamSchema,
   IndexMemberSchema,
   SearchMemberSchema,
   ShowMemberSchema,
@@ -325,8 +325,14 @@ export async function calculateDepositExisting(
   }
 }
 
-export async function getCard(request: FastifyRequest<GetCardMemberSchema>, reply: FastifyReply) {
+export async function getMemberCard(request: FastifyRequest<MemberIdParamSchema>, reply: FastifyReply) {
   const stream = await pdfService.generateMemberCard(request.params.id);
+  reply.header("Content-Type", "application/pdf");
+  reply.send(stream);
+}
+
+export async function getDepositForm(request: FastifyRequest<MemberIdParamSchema>, reply: FastifyReply) {
+  const stream = await pdfService.generateDepositForm(request.params.id);
   reply.header("Content-Type", "application/pdf");
   reply.send(stream);
 }

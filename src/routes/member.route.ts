@@ -12,7 +12,7 @@ import {
   calculateDepositExistingMemberSchema,
   addLoanMemberSchema,
   createDepositMemberSchema,
-  getCardMemberSchema,
+  memberIdParamSchema,
 } from "@/schemas/member.schema";
 
 const memberRoutes = async (fastify: FastifyInstance) => {
@@ -81,8 +81,13 @@ const memberRoutes = async (fastify: FastifyInstance) => {
   );
   fastify.get(
     "/:id/card",
-    { schema: getCardMemberSchema, preHandler: [fastify.authenticate] },
-    memberController.getCard,
+    { schema: memberIdParamSchema, preHandler: [fastify.authenticate] },
+    memberController.getMemberCard,
+  );
+  fastify.get(
+    "/:id/deposit-form",
+    { schema: memberIdParamSchema, preHandler: [fastify.authenticate] },
+    memberController.getDepositForm,
   );
 };
 

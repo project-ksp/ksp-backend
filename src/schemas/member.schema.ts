@@ -126,7 +126,7 @@ export const calculateDepositExistingMemberSchema = {
   } as const,
 };
 
-export const getCardMemberSchema = {
+export const memberIdParamSchema = {
   params: {
     type: "object",
     required: ["id"],
@@ -147,4 +147,4 @@ export type UpdateStatusMemberSchema = SchemaToRequestTypes<typeof updateStatusM
 export type VerifyMemberSchema = SchemaToRequestTypes<typeof verifyMemberSchema>;
 export type CalculateDepositMemberSchema = SchemaToRequestTypes<typeof calculateDepositMemberSchema>;
 export type CalculateDepositExistingMemberSchema = SchemaToRequestTypes<typeof calculateDepositExistingMemberSchema>;
-export type GetCardMemberSchema = SchemaToRequestTypes<typeof getCardMemberSchema>;
+export type MemberIdParamSchema = SchemaToRequestTypes<typeof memberIdParamSchema>;

@@ -31,7 +31,7 @@ export const insertDepositSchema = createInsertSchema(deposits).omit({
 
 export const addDepositSchema = createInsertSchema(deposits, {
   mandatoryDeposit: (schema) => schema.mandatoryDeposit.multipleOf(5000),
-  voluntaryDeposit: (schema) => schema.voluntaryDeposit.positive(),
+  voluntaryDeposit: (schema) => schema.voluntaryDeposit.nonnegative(),
 }).pick({
   mandatoryDeposit: true,
   voluntaryDeposit: true,

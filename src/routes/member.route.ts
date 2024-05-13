@@ -11,6 +11,7 @@ import {
   calculateDepositMemberSchema,
   calculateDepositExistingMemberSchema,
   addLoanMemberSchema,
+  createDepositMemberSchema,
 } from "@/schemas/member.schema";
 
 const memberRoutes = async (fastify: FastifyInstance) => {
@@ -27,6 +28,11 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     memberController.search,
   );
   fastify.get("/:id", { schema: showMemberSchema, preHandler: [fastify.authenticate] }, memberController.show);
+  fastify.post(
+    "/deposit",
+    { schema: createDepositMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
+    memberController.createWithDeposit,
+  );
   fastify.post(
     "/loan",
     { schema: createLoanMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },

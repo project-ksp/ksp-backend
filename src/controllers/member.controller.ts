@@ -5,6 +5,7 @@ import type {
   AddLoanMemberSchema,
   CalculateDepositExistingMemberSchema,
   CalculateDepositMemberSchema,
+  CreateDepositMemberSchema,
   CreateLoanMemberSchema,
   IndexMemberSchema,
   SearchMemberSchema,
@@ -101,6 +102,39 @@ export async function show(request: FastifyRequest<ShowMemberSchema>, reply: Fas
     message: "Member successfully fetched.",
     data,
   });
+}
+
+export async function createWithDeposit(request: FastifyRequest<CreateDepositMemberSchema>, reply: FastifyReply) {
+  const { member, deposit } = request.body;
+
+  const validatedMember = insertMemberSchema.safeParse(member);
+  if (!validatedMember.success) {
+    return reply.status(400).send({
+      message: fromError(validatedMember.error).toString(),
+    });
+  }
+
+  const validatedDeposit = addDepositSchema.safeParse(deposit);
+  if (!validatedDeposit.success) {
+    return reply.status(400).send({
+      message: fromError(validatedDeposit.error).toString(),
+    });
+  }
+
+  try {
+    const memberRet = await memberService.createMemberWithDeposit({
+      member: { ...validatedMember.data, branchId: request.user.branchId, userId: request.user.id },
+      deposit: { ...validatedDeposit.data, principalDeposit: 50000 },
+    });
+    reply.send({
+      message: "Member successfully created.",
+      data: memberRet,
+    });
+  } catch (error) {
+    return reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
 }
 
 export async function createWithLoan(request: FastifyRequest<CreateLoanMemberSchema>, reply: FastifyReply) {

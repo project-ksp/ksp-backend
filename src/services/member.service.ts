@@ -110,6 +110,65 @@ export async function getMemberById(id: string) {
   })!;
 }
 
+export async function createMemberWithDeposit(data: {
+  member: Omit<typeof members.$inferInsert, "id">;
+  deposit: Omit<typeof deposits.$inferInsert, "memberId">;
+}) {
+  const { member, deposit } = data;
+
+  const id = await generateId(member);
+  member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
+  member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
+
+  try {
+    const memberReturned = await db.transaction(async (tx) => {
+      const [memberRet] = await tx
+        .insert(members)
+        .values({ id, ...member })
+        .returning();
+
+      if (!memberRet) {
+        tx.rollback();
+        return;
+      }
+
+      const [depositRet] = await tx
+        .insert(deposits)
+        .values({
+          memberId: memberRet.id,
+          ...deposit,
+        })
+        .returning();
+
+      if (!depositRet) {
+        tx.rollback();
+        return;
+      }
+
+      return memberRet;
+    });
+
+    if (!memberReturned) {
+      throw new Error("Failed to create member.");
+    }
+
+    return await db.query.members.findFirst({
+      where: eq(members.id, memberReturned.id),
+      with: {
+        deposit: {
+          with: {
+            loans: true,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    uploadService.unpersistFile(member.profilePictureUrl);
+    uploadService.unpersistFile(member.idPictureUrl);
+    throw error;
+  }
+}
+
 export async function createMemberWithLoan(data: {
   member: Omit<typeof members.$inferInsert, "id">;
   loan: typeof loans.$inferInsert;

@@ -1,7 +1,33 @@
 import { db } from "@/db";
 import { deposits, loans } from "@/db/schemas";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import * as memberService from "./member.service";
+
+export async function getAllLoans({ where = {} }: { where?: Partial<typeof loans.$inferSelect> }) {
+  return db.query.members.findMany({
+    where: and(...Object.entries(where).map(([key, value]) => eq(loans[key as keyof typeof where], value!))),
+    with: {
+      deposit: {
+        with: {
+          member: true,
+        },
+      },
+    },
+  });
+}
+
+export async function updateLoan(id: number, data: Partial<typeof loans.$inferInsert>) {
+  const [loan] = await db
+    .update(loans)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(loans.id, id))
+    .returning();
+  if (!loan) {
+    throw new Error("Loan not found");
+  }
+
+  return loan;
+}
 
 export async function verifyLoan(id: number) {
   const loan = await db.query.loans.findFirst({
@@ -12,6 +38,9 @@ export async function verifyLoan(id: number) {
   });
   if (!loan) {
     throw new Error("Loan not found.");
+  }
+  if (loan.status !== "disetujui") {
+    throw new Error("Loan not approved yet.");
   }
   if (loan.verified) {
     throw new Error("Loan already verified.");

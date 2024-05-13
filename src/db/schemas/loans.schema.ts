@@ -4,6 +4,7 @@ import { relations } from "drizzle-orm";
 import { leaders } from "./leaders.schema";
 import { createInsertSchema } from "drizzle-zod";
 import { branches } from "./branches.schema";
+import { statusEnum } from "./enums.schema";
 
 export const loans = pgTable("loans", {
   id: serial("id").primaryKey(),
@@ -17,8 +18,10 @@ export const loans = pgTable("loans", {
   branchId: serial("branch_id")
     .notNull()
     .references(() => branches.id),
+  status: statusEnum("status").notNull().default("diproses"),
   verified: boolean("verified").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const loansRelations = relations(loans, ({ one }) => ({
@@ -37,14 +40,18 @@ export const loansRelations = relations(loans, ({ one }) => ({
 }));
 
 export const insertLoanSchema = createInsertSchema(loans).omit({
+  status: true,
   branchId: true,
   verified: true,
   depositId: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const addLoanSchema = createInsertSchema(loans).omit({
+  status: true,
   verified: true,
   depositId: true,
   createdAt: true,
+  updatedAt: true,
 });

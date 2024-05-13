@@ -1,4 +1,4 @@
-import { memberStatusEnum } from "@/db/schemas";
+import { statusEnum } from "@/db/schemas";
 import type SchemaToRequestTypes from ".";
 
 export const indexMemberSchema = {
@@ -73,7 +73,7 @@ export const updateStatusMemberSchema = {
     type: "object",
     required: ["status"],
     properties: {
-      status: { type: "string", enum: memberStatusEnum.enumValues },
+      status: { type: "string", enum: statusEnum.enumValues },
     },
   } as const,
 };

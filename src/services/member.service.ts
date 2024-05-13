@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { members, deposits, type addDepositSchema } from "@/db/schemas";
-import { count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
 import { loans } from "@/db/schemas/loans.schema";
 import * as uploadService from "./upload.service";
@@ -73,7 +73,12 @@ export async function getAllMembersWithPagination(
   page = 1,
   { where = {} }: { where?: Partial<typeof members.$inferSelect> } = {},
 ) {
-  const pageCount = (await db.select({ count: count() }).from(members))[0]!;
+  const pageCount = (
+    await db
+      .select({ count: count() })
+      .from(members)
+      .where(and(...Object.entries(where).map(([key, value]) => eq(members[key as keyof typeof where], value!))))
+  )[0]!;
   const totalPages = Math.ceil(pageCount.count / PAGE_SIZE);
 
   if (page < 1 || page > totalPages) {

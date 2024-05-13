@@ -1,6 +1,7 @@
 import type {
   CreateDeleteRequestSchema,
   RemoveDeleteRequestSchema,
+  ShowDeleteRequestSchema,
   UpdateStatusDeleteRequestSchema,
 } from "@/schemas/deleteRequest.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
@@ -11,6 +12,21 @@ export async function index(_request: FastifyRequest, reply: FastifyReply) {
   reply.send({
     message: "Delete request list retrieved successfully.",
     data: await deleteRequestService.getAllRequests(),
+  });
+}
+
+export async function show(request: FastifyRequest<ShowDeleteRequestSchema>, reply: FastifyReply) {
+  const data = await deleteRequestService.getRequestById(request.params.id);
+  if (!data) {
+    reply.status(404).send({
+      message: "Delete request not found.",
+    });
+    return;
+  }
+
+  reply.send({
+    message: "Delete request retrieved successfully.",
+    data,
   });
 }
 

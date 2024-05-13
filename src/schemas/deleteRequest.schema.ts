@@ -13,6 +13,16 @@ export const createDeleteRequestSchema = {
   } as const,
 };
 
+export const showDeleteRequestSchema = {
+  params: {
+    type: "object",
+    required: ["id"],
+    properties: {
+      id: { type: "number" },
+    },
+  } as const,
+};
+
 export const updateStatusDeleteRequestSchema = {
   params: {
     type: "object",
@@ -41,5 +51,6 @@ export const removeDeleteRequestSchema = {
 };
 
 export type CreateDeleteRequestSchema = SchemaToRequestTypes<typeof createDeleteRequestSchema>;
+export type ShowDeleteRequestSchema = SchemaToRequestTypes<typeof showDeleteRequestSchema>;
 export type UpdateStatusDeleteRequestSchema = SchemaToRequestTypes<typeof updateStatusDeleteRequestSchema>;
 export type RemoveDeleteRequestSchema = SchemaToRequestTypes<typeof removeDeleteRequestSchema>;

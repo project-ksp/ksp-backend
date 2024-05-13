@@ -24,6 +24,29 @@ export async function getAllRequests() {
   });
 }
 
+export async function getRequestById(id: number) {
+  return db.query.deleteRequests.findFirst({
+    where: eq(deleteRequests.id, id),
+    with: {
+      member: {
+        with: {
+          leader: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
+          deposit: {
+            with: {
+              loans: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 export async function createRequest(data: typeof deleteRequests.$inferInsert) {
   try {
     const proofUrl = uploadService.persistTemporaryFile(data.proofUrl);

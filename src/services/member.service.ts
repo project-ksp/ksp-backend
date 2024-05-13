@@ -177,6 +177,7 @@ export async function createMemberWithLoan(data: {
   const depositValues = await calculateNewMemberDeposit(loan.loan);
 
   const id = await generateId(member);
+  console.log(id);
   member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
   member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
 
@@ -371,7 +372,7 @@ export async function calculateExistingMemberDeposit(id: string, loan: number) {
 async function generateId(data: Omit<typeof members.$inferInsert, "id">) {
   const { branchId, leaderId } = data;
 
-  const { value } = (
+  let { value } = (
     await db
       .select({
         value: count(members.id),
@@ -382,5 +383,11 @@ async function generateId(data: Omit<typeof members.$inferInsert, "id">) {
 
   const regionId = data.nik.startsWith("35") ? "01" : "02";
 
-  return `${regionId}.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
+  let id = `${regionId}.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
+  while (await db.query.members.findFirst({ where: eq(members.id, id) })) {
+    value++;
+    id = `${regionId}.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
+  }
+
+  return id;
 }

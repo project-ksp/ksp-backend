@@ -5,8 +5,16 @@ import {
 } from "@/schemas/deleteRequest.schema";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import * as deleteRequestService from "@/services/deleteRequest.service";
+import * as uploadService from "@/services/upload.service";
 
 export async function create(request: FastifyRequest<CreateDeleteRequestSchema>, reply: FastifyReply) {
+  if (!uploadService.isTemporaryFileExists(request.body.proofUrl)) {
+    reply.status(400).send({
+      message: "Proof URL is invalid.",
+    });
+    return;
+  }
+
   try {
     const data = await deleteRequestService.createRequest(request.body);
     reply.send({

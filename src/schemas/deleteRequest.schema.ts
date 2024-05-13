@@ -4,9 +4,10 @@ import type SchemaToRequestTypes from ".";
 export const createDeleteRequestSchema = {
   body: {
     type: "object",
-    required: ["memberId", "proofUrl"],
+    required: ["memberId", "reason", "proofUrl"],
     properties: {
       memberId: { type: "string" },
+      reason: { type: "string" },
       proofUrl: { type: "string" },
     },
   } as const,

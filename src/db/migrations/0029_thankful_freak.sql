@@ -1,0 +1,1 @@
+ALTER TABLE "delete_requests" ADD COLUMN "reason" text NOT NULL;

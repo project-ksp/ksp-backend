@@ -63,6 +63,16 @@ export async function indexPending(request: FastifyRequest, reply: FastifyReply)
   });
 }
 
+export async function indexInactive(request: FastifyRequest, reply: FastifyReply) {
+  const data = await memberService.getAllMembers({
+    where: { branchId: request.user.branchId, isActive: false },
+  });
+  return reply.send({
+    message: "Members successfully fetched.",
+    data,
+  });
+}
+
 export async function search(request: FastifyRequest<SearchMemberSchema>, reply: FastifyReply) {
   const { query } = request.query;
 

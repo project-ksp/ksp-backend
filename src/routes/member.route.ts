@@ -48,6 +48,11 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     memberController.verify,
   );
   fastify.post(
+    "/:id/deposit",
+    { schema: addLoanMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
+    memberController.addDeposit,
+  );
+  fastify.post(
     "/:id/loan",
     { schema: addLoanMemberSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },
     memberController.addLoan,

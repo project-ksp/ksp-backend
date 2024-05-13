@@ -1,9 +1,10 @@
 import { db } from "@/db";
-import { members, deposits } from "@/db/schemas";
+import { members, deposits, addDepositSchema } from "@/db/schemas";
 import { count, desc, eq } from "drizzle-orm";
 import { PAGE_SIZE } from ".";
 import { loans } from "@/db/schemas/loans.schema";
 import * as uploadService from "./upload.service";
+import { z } from "zod";
 
 const ADMIN_PERCENTAGE = 0.05;
 const MINIMUM_PRINCIPAL_DEPOSIT = 50000;
@@ -106,7 +107,7 @@ export async function getMemberById(id: string) {
         },
       },
     },
-  });
+  })!;
 }
 
 export async function createMemberWithLoan(data: {
@@ -171,6 +172,20 @@ export async function createMemberWithLoan(data: {
     uploadService.unpersistFile(member.idPictureUrl);
     throw error;
   }
+}
+
+export async function addDepositToMember(id: string, data: z.infer<typeof addDepositSchema>) {
+  const member = await getMemberById(id);
+  if (!member) {
+    throw new Error("Member not found.");
+  }
+
+  const [deposit] = await db.update(deposits).set(data).where(eq(deposits.memberId, id)).returning();
+  if (!deposit) {
+    throw new Error("Failed to add deposit to member.");
+  }
+
+  return getMemberById(id);
 }
 
 export async function addLoanToMember(id: string, data: typeof loans.$inferInsert) {

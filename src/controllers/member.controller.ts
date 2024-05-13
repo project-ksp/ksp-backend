@@ -13,7 +13,7 @@ import type {
   UpdateStatusMemberSchema,
   VerifyMemberSchema,
 } from "@/schemas/member.schema";
-import { insertMemberSchema, updateMemberSchema } from "@/db/schemas";
+import { addDepositSchema, insertMemberSchema, updateMemberSchema } from "@/db/schemas";
 import { fromError } from "zod-validation-error";
 import { addLoanSchema, insertLoanSchema } from "@/db/schemas/loans.schema";
 
@@ -190,6 +190,28 @@ export async function verify(request: FastifyRequest<VerifyMemberSchema>, reply:
     const data = await memberService.updateMember(id, { verified: true });
     reply.send({
       message: "Member successfully verified.",
+      data,
+    });
+  } catch (error) {
+    return reply.status(400).send({
+      message: error instanceof Error ? error.message : "An error occurred.",
+    });
+  }
+}
+
+export async function addDeposit(request: FastifyRequest<AddLoanMemberSchema>, reply: FastifyReply) {
+  const { id } = request.params;
+  const validated = addDepositSchema.safeParse(request.body);
+  if (!validated.success) {
+    return reply.status(400).send({
+      message: fromError(validated.error).toString(),
+    });
+  }
+
+  try {
+    const data = await memberService.addDepositToMember(id, validated.data);
+    reply.send({
+      message: "Deposit successfully added to member.",
       data,
     });
   } catch (error) {

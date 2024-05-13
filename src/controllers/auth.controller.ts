@@ -1,6 +1,7 @@
 import type { AccessBranchSchema, LoginSchema } from "@/schemas/auth.schema";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import * as userService from "@/services/user.service";
+import * as ownerService from "@/services/owner.service";
 
 export async function authenticate(request: FastifyRequest<LoginSchema>, reply: FastifyReply) {
   const { username, password } = request.body;
@@ -35,6 +36,13 @@ export async function getAuthUserData(request: FastifyRequest, reply: FastifyRep
   reply.send({
     message: "Fetched user data successfully",
     data: user,
+  });
+}
+
+export async function overview(_request: FastifyRequest, reply: FastifyReply) {
+  reply.send({
+    message: "Fetched system overview successfully",
+    data: await ownerService.getSystemOverview(),
   });
 }
 

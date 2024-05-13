@@ -7,6 +7,7 @@ import {
 import type { FastifyInstance } from "fastify";
 
 const deleteRequestRoutes = async (fastify: FastifyInstance) => {
+  fastify.get("/", { preHandler: [fastify.authorize(["branch_head", "teller"])] }, deleteRequestController.index);
   fastify.post(
     "/",
     { schema: createDeleteRequestSchema, preHandler: [fastify.authorize(["branch_head", "teller"])] },

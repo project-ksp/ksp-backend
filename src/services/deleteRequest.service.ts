@@ -3,6 +3,27 @@ import * as uploadService from "./upload.service";
 import { db } from "@/db";
 import { eq } from "drizzle-orm";
 
+export async function getAllRequests() {
+  return db.query.deleteRequests.findMany({
+    columns: {
+      id: true,
+      reason: true,
+      status: true,
+    },
+    with: {
+      member: {
+        columns: {
+          id: true,
+          name: true,
+          nik: true,
+          gender: true,
+          isActive: true,
+        },
+      },
+    },
+  });
+}
+
 export async function createRequest(data: typeof deleteRequests.$inferInsert) {
   try {
     const proofUrl = uploadService.persistTemporaryFile(data.proofUrl);

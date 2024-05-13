@@ -13,5 +13,6 @@ export default async function depositFactory(): Promise<typeof deposits.$inferIn
       min: 50000,
       max: 10000000,
     }),
+    memberId: "",
   };
 }

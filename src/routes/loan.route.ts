@@ -3,17 +3,13 @@ import { updateStatusLoanSchema, verifyLoanSchema } from "@/schemas/loan.schema"
 import type { FastifyInstance } from "fastify";
 
 const loanRoutes = async (fastify: FastifyInstance) => {
-  fastify.get("/pending", { preHandler: [fastify.authorize(["owner", "branch_head"])] }, loanController.indexPending);
+  fastify.get("/pending", { preHandler: [fastify.authenticate] }, loanController.indexPending);
   fastify.put(
     "/:id/status",
-    { schema: updateStatusLoanSchema, preHandler: [fastify.authorize(["owner", "branch_head"])] },
+    { schema: updateStatusLoanSchema, preHandler: [fastify.authenticate] },
     loanController.updateStatus,
   );
-  fastify.post(
-    "/:id/verify",
-    { schema: verifyLoanSchema, preHandler: [fastify.authorize(["owner", "branch_head"])] },
-    loanController.verify,
-  );
+  fastify.post("/:id/verify", { schema: verifyLoanSchema, preHandler: [fastify.authenticate] }, loanController.verify);
 };
 
 export default loanRoutes;

@@ -41,7 +41,7 @@ export function persistTemporaryFile(name: string) {
     return name;
   }
 
-  fs.mkdirSync(uploadDir, { recursive: true });
+  fs.mkdirSync(path.join(uploadDir, "uploads/"), { recursive: true });
   const newName = `uploads/${name}`;
   const source = path.join(tempDir, name);
   const destination = path.join(uploadDir, newName);

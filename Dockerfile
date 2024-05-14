@@ -24,6 +24,7 @@ WORKDIR /usr/src/app
 
 # Copy built files from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist
+COPY ./src/storage ./dist/storage
 
 # Copy only production node_modules (skip devDependencies)
 COPY --from=builder /usr/src/app/node_modules ./node_modules

@@ -25,7 +25,6 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 }));
 
 export const userInsertSchema = createInsertSchema(users)
-  .strict()
   .omit({
     username: true,
     password: true,

@@ -13,6 +13,8 @@ const uploadDir = path.join(__dirname, "../storage/public");
 const placeholderFilename = "placeholder.png";
 
 export async function storeTemporary(data: MultipartFile) {
+  fs.mkdirSync(tempDir, { recursive: true });
+
   const name = crypto.randomUUID() + "." + mime.extension(data.mimetype);
   const location = path.join(tempDir, name);
   await pump(data.file, fs.createWriteStream(location));
@@ -39,6 +41,7 @@ export function persistTemporaryFile(name: string) {
     return name;
   }
 
+  fs.mkdirSync(uploadDir, { recursive: true });
   const newName = `uploads/${name}`;
   const source = path.join(tempDir, name);
   const destination = path.join(uploadDir, newName);

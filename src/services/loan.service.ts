@@ -21,6 +21,7 @@ export async function getAllLoans({ where = {} }: { where?: Partial<typeof loans
               name: true,
               nik: true,
               gender: true,
+              isActive: true,
             },
           },
         },

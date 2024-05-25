@@ -253,13 +253,6 @@ export async function generateRegistrationForm(id: string) {
     font: helveticaFont,
   });
 
-  pages[0]!.drawText(member.postalCode, {
-    x: 415,
-    y: height - 341,
-    size: 10,
-    font: helveticaFont,
-  });
-
   pages[0]!.drawText(member.phoneNumber, {
     x: 415,
     y: height - 361,

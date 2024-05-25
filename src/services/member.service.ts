@@ -122,7 +122,6 @@ export async function createMemberWithDeposit(data: {
   const { member, deposit } = data;
 
   const id = await generateId(member);
-  member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
   member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
 
   try {
@@ -168,7 +167,6 @@ export async function createMemberWithDeposit(data: {
       },
     });
   } catch (error) {
-    uploadService.unpersistFile(member.profilePictureUrl);
     uploadService.unpersistFile(member.idPictureUrl);
     throw error;
   }
@@ -182,7 +180,6 @@ export async function createMemberWithLoan(data: {
   const depositValues = await calculateNewMemberDeposit(loan.loan);
 
   const id = await generateId(member);
-  member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
   member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
 
   try {
@@ -232,7 +229,6 @@ export async function createMemberWithLoan(data: {
       },
     });
   } catch (error) {
-    uploadService.unpersistFile(member.profilePictureUrl);
     uploadService.unpersistFile(member.idPictureUrl);
     throw error;
   }

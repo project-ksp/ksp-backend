@@ -211,6 +211,20 @@
       "when": 1715619423912,
       "tag": "0029_thankful_freak",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1716610069267,
+      "tag": "0030_first_vulture",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1716611550752,
+      "tag": "0031_faithful_drax",
+      "breakpoints": true
     }
   ]
 }

@@ -492,12 +492,23 @@ export async function generateMemberListBook(branchId: number) {
             font: helveticaFont,
           },
         );
+
         page.drawText(member.deleteRequests.reason, {
           x: 797,
           y,
           size: 6,
           font: helveticaFont,
         });
+
+        page.drawText(
+          member.deleteRequests.reason,
+          {
+            x: 797,
+            y,
+            size: 6,
+            font: helveticaFont,
+          },
+        );
       }
 
       y -= 25;

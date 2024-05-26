@@ -348,3 +348,9 @@ export async function getRegistrationForm(request: FastifyRequest<MemberIdParamS
   reply.header("Content-Type", "application/pdf");
   reply.send(stream);
 }
+
+export async function getMemberListBook(request: FastifyRequest<MemberIdParamSchema>, reply: FastifyReply) {
+  const stream = await pdfService.generateMemberListBook(request.user.branchId);
+  reply.header("Content-Type", "application/pdf");
+  reply.send(stream);
+}

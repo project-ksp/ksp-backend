@@ -54,7 +54,7 @@ export async function getUserByID(id: number) {
 
 export async function createUser(data: z.infer<typeof userInsertSchema>) {
   const username = await generateUsername(data.role, data.branchId ?? 0);
-  const password = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  const password = Math.random().toString(36).slice(-6);
 
   if (data.role === "owner") {
     data.branchId = (await branchService.getAllBranches())[0]!.id;

@@ -29,12 +29,6 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
 
   const { branch: branchData, branchHead: branchHeadData } = validated.data;
 
-  if (!uploadService.isTemporaryFileExists(branchHeadData.profilePictureUrl)) {
-    return reply.status(400).send({
-      message: "Profile picture does not exist",
-    });
-  }
-
   if (!uploadService.isTemporaryFileExists(branchHeadData.idPictureUrl)) {
     return reply.status(400).send({
       message: "ID picture does not exist",

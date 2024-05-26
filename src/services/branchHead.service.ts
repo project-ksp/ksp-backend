@@ -4,10 +4,8 @@ import * as uploadService from "./upload.service";
 
 export async function createBranchHead(data: typeof branchHeads.$inferInsert) {
   try {
-    const profilePictureUrl = uploadService.persistTemporaryFile(data.profilePictureUrl);
     const idPictureUrl = uploadService.persistTemporaryFile(data.idPictureUrl);
 
-    data.profilePictureUrl = profilePictureUrl;
     data.idPictureUrl = idPictureUrl;
 
     const [branchHead] = await db.insert(branchHeads).values(data).returning();
@@ -17,7 +15,6 @@ export async function createBranchHead(data: typeof branchHeads.$inferInsert) {
 
     return branchHead;
   } catch (error) {
-    uploadService.unpersistFile(data.profilePictureUrl);
     uploadService.unpersistFile(data.idPictureUrl);
     throw error;
   }

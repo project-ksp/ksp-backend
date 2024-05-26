@@ -60,13 +60,45 @@ export async function getAllMembers({
 
   data.forEach((member) =>
     Object.assign(member, {
-      totalDeposit: member.deposit.principalDeposit + member.deposit.mandatoryDeposit + member.deposit.voluntaryDeposit,
       totalLoan: member.deposit.loans.reduce((acc, loan) => acc + loan.loan, 0),
-      deposit: undefined,
     }),
   );
 
   return data;
+}
+
+export async function getAllMembersWithDeletion({
+  where = {},
+  query = {},
+  limit,
+  offset,
+}: {
+  where?: Partial<typeof members.$inferSelect>;
+  query?: Partial<typeof members.$inferSelect>;
+  limit?: number;
+  offset?: number;
+}) {
+  return db.query.members.findMany({
+    where: (members, { eq, ilike, and, or }) =>
+      and(
+        and(...Object.entries(where).map(([key, value]) => eq(members[key as keyof typeof members], value!))),
+        or(
+          ...Object.entries(query).map(([key, value]) =>
+            ilike(members[key as keyof typeof members], `%${value?.toString()}%`),
+          ),
+        ),
+      ),
+    limit,
+    offset,
+    with: {
+      deleteRequests: {
+        columns: {
+          reason: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
 }
 
 export async function getAllMembersWithPagination(
@@ -122,7 +154,6 @@ export async function createMemberWithDeposit(data: {
   const { member, deposit } = data;
 
   const id = await generateId(member);
-  member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
   member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
 
   try {
@@ -168,7 +199,6 @@ export async function createMemberWithDeposit(data: {
       },
     });
   } catch (error) {
-    uploadService.unpersistFile(member.profilePictureUrl);
     uploadService.unpersistFile(member.idPictureUrl);
     throw error;
   }
@@ -182,7 +212,6 @@ export async function createMemberWithLoan(data: {
   const depositValues = await calculateNewMemberDeposit(loan.loan);
 
   const id = await generateId(member);
-  member.profilePictureUrl = uploadService.persistTemporaryFile(member.profilePictureUrl);
   member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
 
   try {
@@ -232,7 +261,6 @@ export async function createMemberWithLoan(data: {
       },
     });
   } catch (error) {
-    uploadService.unpersistFile(member.profilePictureUrl);
     uploadService.unpersistFile(member.idPictureUrl);
     throw error;
   }

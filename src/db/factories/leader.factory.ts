@@ -15,10 +15,8 @@ export default async function leaderFactory(): Promise<typeof leaders.$inferInse
     kelurahan: faker.location.buildingNumber(),
     kecamatan: faker.location.cardinalDirection(),
     city: faker.location.city(),
-    postalCode: faker.string.numeric(5),
     phoneNumber: faker.string.numeric(12),
     education: educationEnum.enumValues[faker.number.int(educationEnum.enumValues.length)] ?? "sma",
-    profilePictureUrl: "placeholder.png",
     idPictureUrl: "placeholder.png",
   };
 }

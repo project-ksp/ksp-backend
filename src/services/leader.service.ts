@@ -53,10 +53,8 @@ export async function getLeaderById(id: string, branchId: number) {
 }
 
 export async function createLeader(data: z.infer<typeof insertLeaderSchema>) {
-  const profilePictureUrl = uploadService.persistTemporaryFile(data.profilePictureUrl);
   const idPictureUrl = uploadService.persistTemporaryFile(data.idPictureUrl);
 
-  data.profilePictureUrl = profilePictureUrl;
   data.idPictureUrl = idPictureUrl;
 
   const [leader] = await db

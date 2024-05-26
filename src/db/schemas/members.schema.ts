@@ -32,10 +32,8 @@ export const members = pgTable("members", {
   kelurahan: varchar("kelurahan", { length: 256 }).notNull(),
   kecamatan: varchar("kecamatan", { length: 256 }).notNull(),
   city: varchar("city", { length: 256 }).notNull(),
-  postalCode: varchar("postal_code", { length: 5 }).notNull(),
   education: educationEnum("education").notNull(),
   phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
-  profilePictureUrl: varchar("profile_picture_url", { length: 256 }).notNull(),
   idPictureUrl: varchar("id_picture_url", { length: 256 }).notNull(),
   userId: serial("user_id").references(() => users.id),
 
@@ -75,23 +73,14 @@ export const insertMemberSchema = createInsertSchema(members)
     createdAt: true,
     updatedAt: true,
   })
-  .refine((input) => input.profilePictureUrl !== input.idPictureUrl, {
-    message: "Profile picture and ID picture must be different.",
-  })
-  .refine(
-    (input) =>
-      uploadService.isTemporaryFileExists(input.profilePictureUrl) &&
-      uploadService.isTemporaryFileExists(input.idPictureUrl),
-    {
-      message: "Profile picture or ID picture is not uploaded yet.",
-    },
-  );
+  .refine((input) => uploadService.isTemporaryFileExists(input.idPictureUrl), {
+    message: "ID picture is not uploaded yet.",
+  });
 
 export const updateMemberSchema = createInsertSchema(members).omit({
   id: true,
   branchId: true,
   leaderId: true,
-  profilePictureUrl: true,
   idPictureUrl: true,
   status: true,
   verified: true,

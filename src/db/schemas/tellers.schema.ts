@@ -17,10 +17,8 @@ export const tellers = pgTable("tellers", {
   kelurahan: varchar("kelurahan", { length: 256 }).notNull(),
   kecamatan: varchar("kecamatan", { length: 256 }).notNull(),
   city: varchar("city", { length: 256 }).notNull(),
-  postalCode: varchar("postal_code", { length: 5 }).notNull(),
   phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
   education: educationEnum("education").notNull(),
-  profilePictureUrl: varchar("profile_picture_url", { length: 256 }).notNull(),
   idPictureUrl: varchar("id_picture_url", { length: 256 }).notNull(),
   branchId: serial("branch_id").references(() => branches.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -39,20 +37,11 @@ export const insertTellerSchema = createInsertSchema(tellers)
     createdAt: true,
     updatedAt: true,
   })
-  .refine((input) => input.profilePictureUrl !== input.idPictureUrl, {
-    message: "Profile picture and ID picture must be different.",
-  })
-  .refine(
-    (input) =>
-      uploadService.isTemporaryFileExists(input.profilePictureUrl) &&
-      uploadService.isTemporaryFileExists(input.idPictureUrl),
-    {
-      message: "Profile picture or ID picture is not uploaded yet.",
-    },
-  );
+  .refine((input) => uploadService.isTemporaryFileExists(input.idPictureUrl), {
+    message: "ID picture is not uploaded yet.",
+  });
 
 export const updateTellerSchema = createInsertSchema(tellers).omit({
-  profilePictureUrl: true,
   idPictureUrl: true,
   createdAt: true,
   updatedAt: true,

@@ -492,6 +492,14 @@ export async function generateMemberListBook(branchId: number) {
             font: helveticaFont,
           },
         );
+
+        page.drawText(member.deleteRequests.reason, {
+          x: 797,
+          y,
+          size: 6,
+          font: helveticaFont,
+        });
+
         page.drawText(
           member.deleteRequests.reason,
           {
@@ -510,6 +518,11 @@ export async function generateMemberListBook(branchId: number) {
 
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
+}
+
+export async function generateDocument(name: string) {
+  const document = await readDocument(name);
+  return document;
 }
 
 async function readDocument(name: string) {

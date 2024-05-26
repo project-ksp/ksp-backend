@@ -11,5 +11,6 @@ export default fp(async (fastify, opts) => {
   fastify.register(import("./leader.route"), { prefix: `${prefix}/leaders` });
   fastify.register(import("./branch.route"), { prefix: `${prefix}/branches` });
   fastify.register(import("./loan.route"), { prefix: `${prefix}/loans` });
+  fastify.register(import("./document.route"), { prefix: `${prefix}/documents` });
   fastify.register(import("./deleteRequest.route"), { prefix: `${prefix}/delete-requests` });
 });

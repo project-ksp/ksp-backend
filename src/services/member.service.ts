@@ -60,9 +60,7 @@ export async function getAllMembers({
 
   data.forEach((member) =>
     Object.assign(member, {
-      totalDeposit: member.deposit.principalDeposit + member.deposit.mandatoryDeposit + member.deposit.voluntaryDeposit,
       totalLoan: member.deposit.loans.reduce((acc, loan) => acc + loan.loan, 0),
-      deposit: undefined,
     }),
   );
 

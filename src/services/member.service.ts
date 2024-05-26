@@ -69,6 +69,40 @@ export async function getAllMembers({
   return data;
 }
 
+export async function getAllMembersWithDeletion({
+  where = {},
+  query = {},
+  limit,
+  offset,
+}: {
+  where?: Partial<typeof members.$inferSelect>;
+  query?: Partial<typeof members.$inferSelect>;
+  limit?: number;
+  offset?: number;
+}) {
+  return db.query.members.findMany({
+    where: (members, { eq, ilike, and, or }) =>
+      and(
+        and(...Object.entries(where).map(([key, value]) => eq(members[key as keyof typeof members], value!))),
+        or(
+          ...Object.entries(query).map(([key, value]) =>
+            ilike(members[key as keyof typeof members], `%${value?.toString()}%`),
+          ),
+        ),
+      ),
+    limit,
+    offset,
+    with: {
+      deleteRequests: {
+        columns: {
+          reason: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
+}
+
 export async function getAllMembersWithPagination(
   page = 1,
   { where = {} }: { where?: Partial<typeof members.$inferSelect> } = {},

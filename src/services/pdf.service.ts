@@ -3,6 +3,7 @@ import path from "path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import * as memberService from "@/services/member.service";
 import * as leaderService from "@/services/leader.service";
+import * as branchService from "@/services/branch.service";
 
 const DOCUMENTS_DIRECTORY = path.join(__dirname, "../storage/public/documents");
 const TEXT_FONT = StandardFonts.Helvetica;
@@ -357,6 +358,155 @@ export async function generateRegistrationForm(id: string) {
     size: 10,
     font: helveticaFont,
   });
+
+  const pdfBytes = await pdfDoc.save();
+  return pdfBytes;
+}
+
+export async function generateMemberListBook(branchId: number) {
+  const branch = await branchService.getBranchById(branchId);
+  if (!branch) {
+    throw new Error("Branch not found.");
+  }
+
+  const members = await memberService.getAllMembersWithDeletion({
+    where: { branchId },
+  });
+  if (members.length === 0) {
+    throw new Error("No members found.");
+  }
+
+  const buffer = await readDocument("Buku Daftar Anggota.pdf");
+
+  const pdfDoc = await PDFDocument.load(buffer);
+  const helveticaFont = await pdfDoc.embedFont(TEXT_FONT);
+
+  const pages = pdfDoc.getPages();
+  const { height: firstPageHeight } = pages[0]!.getSize();
+  const totalPage = Math.ceil(members.length / 20);
+
+  pages[0]!.drawText(branch.kecamatan, {
+    x: 170,
+    y: firstPageHeight - 325,
+    size: 14,
+    font: helveticaFont,
+  });
+  pages[0]!.drawText(branch.id.toString(), {
+    x: 170,
+    y: firstPageHeight - 350,
+    size: 14,
+    font: helveticaFont,
+  });
+  for (let i = 1; i <= totalPage; i++) {
+    if (i > 1) {
+      const newPdf = await pdfDoc.copyPages(pdfDoc, [1]);
+      pdfDoc.addPage(newPdf[0]);
+    }
+  }
+
+  let currentMember = 0;
+  for (let i = 0; i < totalPage; i++) {
+    const page = pdfDoc.getPages()[i + 1]!;
+    const { height } = page.getSize();
+    let y = height - 123;
+    for (let j = 0; j < 19; j++) {
+      if (currentMember >= members.length) {
+        break;
+      }
+
+      const member = members[currentMember]!;
+      const memberAge = new Date().getFullYear() - new Date(member.birthDate).getFullYear();
+      page.drawText(member.id, {
+        x: 40,
+        y,
+        size: 8,
+        font: helveticaFont,
+      });
+
+      page.drawText(member.name, {
+        x: 100,
+        y,
+        size: 8,
+        font: helveticaFont,
+      });
+      page.drawText(member.nik, {
+        x: 220,
+        y,
+        size: 8,
+        font: helveticaFont,
+      });
+
+      page.drawText(memberAge.toString(), {
+        x: 335,
+        y,
+        size: 8,
+        font: helveticaFont,
+      });
+
+      page.drawText(member.gender.charAt(0).toUpperCase(), {
+        x: 360,
+        y,
+        size: 8,
+        font: helveticaFont,
+      });
+
+      page.drawText(member.occupation, {
+        x: 387,
+        y,
+        size: 7,
+        font: helveticaFont,
+      });
+
+      page.drawText(member.address, {
+        x: 465,
+        y,
+        size: 7,
+        font: helveticaFont,
+      });
+
+      page.drawText(
+        new Date(member.createdAt).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "numeric",
+          year: "numeric",
+        }),
+        {
+          x: 536,
+          y,
+          size: 8,
+          font: helveticaFont,
+        },
+      );
+
+      if (member?.deleteRequests) {
+        page.drawText(
+          new Date(member.deleteRequests.updatedAt).toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+          }),
+          {
+            x: 757,
+            y,
+            size: 8,
+            font: helveticaFont,
+          },
+        );
+        page.drawText(
+          member.deleteRequests.reason,
+          {
+            x: 797,
+            y,
+            size: 6,
+            font: helveticaFont,
+          },
+        );
+      }
+
+      y -= 25;
+      currentMember++;
+    }
+  }
 
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;

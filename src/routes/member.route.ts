@@ -99,6 +99,11 @@ const memberRoutes = async (fastify: FastifyInstance) => {
     { schema: memberIdParamSchema, preHandler: [fastify.authenticate] },
     memberController.getRegistrationForm,
   );
+  fastify.get(
+    "/list-book",
+    { preHandler: [fastify.authorize(["branch_head", "teller"])] },
+    memberController.getMemberListBook,
+  );
 };
 
 export default memberRoutes;

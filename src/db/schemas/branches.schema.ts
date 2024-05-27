@@ -13,7 +13,6 @@ export const branches = pgTable("branches", {
   kelurahan: varchar("kelurahan", { length: 256 }).notNull(),
   kecamatan: varchar("kecamatan", { length: 256 }).notNull(),
   city: varchar("city", { length: 256 }).notNull(),
-  postalCode: varchar("postal_code", { length: 5 }).notNull(),
   publishAmount: integer("publish_amount").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

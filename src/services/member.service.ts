@@ -388,18 +388,21 @@ export async function calculateExistingMemberDeposit(id: string, loan: number, m
   const adminFee = loan * ADMIN_PERCENTAGE;
   let { principalDeposit } = member.deposit;
   let newMandatoryDeposit = mandatoryDeposit;
+  let remainingAdminFee = adminFee;
   let newVoluntaryDeposit = 0;
 
   if (principalDeposit < MAX_PRINCIPAL_DEPOSIT) {
-    const remainingPrincipalDeposit = MAX_PRINCIPAL_DEPOSIT - principalDeposit;
-    if (adminFee <= remainingPrincipalDeposit) {
-      principalDeposit += adminFee;
-    } else {
+    if (adminFee > MAX_PRINCIPAL_DEPOSIT) {
       principalDeposit = MAX_PRINCIPAL_DEPOSIT;
+      remainingAdminFee = adminFee - principalDeposit;
+      newMandatoryDeposit = remainingAdminFee > mandatoryDeposit ? mandatoryDeposit : remainingAdminFee;
+      newVoluntaryDeposit = remainingAdminFee - newMandatoryDeposit;
+    } else {
+      principalDeposit = adminFee;
+      newMandatoryDeposit = 0;
     }
   } else {
     principalDeposit = MAX_PRINCIPAL_DEPOSIT;
-    newMandatoryDeposit = mandatoryDeposit;
     newVoluntaryDeposit = adminFee - principalDeposit - mandatoryDeposit;
   }
 

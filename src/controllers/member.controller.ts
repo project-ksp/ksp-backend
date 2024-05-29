@@ -290,10 +290,10 @@ export async function addLoan(request: FastifyRequest<AddLoanMemberSchema>, repl
 }
 
 export async function calculateDeposit(request: FastifyRequest<CalculateDepositMemberSchema>, reply: FastifyReply) {
-  const { loan } = request.body;
+  const { loan, mandatoryDeposit } = request.body;
 
   try {
-    const data = await memberService.calculateNewMemberDeposit(loan);
+    const data = await memberService.calculateNewMemberDeposit(loan, mandatoryDeposit);
     reply.send({
       message: "Deposit successfully calculated.",
       data,
@@ -310,10 +310,10 @@ export async function calculateDepositExisting(
   reply: FastifyReply,
 ) {
   const { id } = request.params;
-  const { loan } = request.body;
+  const { loan, mandatoryDeposit } = request.body;
 
   try {
-    const data = await memberService.calculateExistingMemberDeposit(id, loan);
+    const data = await memberService.calculateExistingMemberDeposit(id, loan, mandatoryDeposit);
     reply.send({
       message: "Deposit successfully calculated.",
       data,

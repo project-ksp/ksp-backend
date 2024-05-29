@@ -7,7 +7,6 @@ export default async function branchFactory(): Promise<typeof branches.$inferIns
     kelurahan: faker.location.buildingNumber(),
     kecamatan: faker.location.cardinalDirection(),
     city: faker.location.city(),
-    postalCode: faker.string.numeric(5),
     publishAmount: faker.number.int(100),
   };
 }

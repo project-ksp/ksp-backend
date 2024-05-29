@@ -17,6 +17,10 @@ COPY . .
 RUN yarn build
 COPY ./src/storage ./dist/storage
 
+# Run migrations and seed the database
+RUN yarn migrate
+RUN yarn seed
+
 # Expose the port the server uses
 EXPOSE 8080
 

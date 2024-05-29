@@ -292,7 +292,7 @@ export async function addDepositToMember(id: string, data: z.infer<typeof addDep
   return getMemberById(id);
 }
 
-export async function addLoanToMember(id: string, data: typeof loans.$inferInsert, mandatoryDeposit: number) {
+export async function addLoanToMember(id: string, data: typeof loans.$inferInsert, mandatoryDeposit = 0) {
   const member = await db.query.members.findFirst({
     where: eq(members.id, id),
     with: {
@@ -342,7 +342,7 @@ export async function updateMember(id: string, data: Partial<typeof members.$inf
   return member;
 }
 
-export async function calculateNewMemberDeposit(loan: number, mandatoryDeposit: number) {
+export async function calculateNewMemberDeposit(loan: number, mandatoryDeposit = 0) {
   const adminFee = loan * ADMIN_PERCENTAGE;
   let principalDeposit = MAX_PRINCIPAL_DEPOSIT;
   let voluntaryDeposit = 0;
@@ -367,7 +367,7 @@ export async function calculateNewMemberDeposit(loan: number, mandatoryDeposit: 
   };
 }
 
-export async function calculateExistingMemberDeposit(id: string, loan: number, mandatoryDeposit: number) {
+export async function calculateExistingMemberDeposit(id: string, loan: number, mandatoryDeposit = 0) {
   const member = await db.query.members.findFirst({
     where: eq(members.id, id),
     with: {

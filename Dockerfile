@@ -15,10 +15,12 @@ COPY . .
 
 # Build the application
 RUN yarn build
-COPY ./src/storage ./dist/storage
 
 # Expose the port the server uses
 EXPOSE 8080
 
+# making sure that the entrypoint script is executable
+RUN chmod +x /usr/src/app/entrypoint.sh
+
 # Command to start the app
-CMD ["yarn", "migrate", "&&", "yarn", "seed", "&&", "yarn", "start"]
+CMD ["/usr/src/app/entrypoint.sh"]

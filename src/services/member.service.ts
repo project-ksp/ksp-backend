@@ -218,7 +218,7 @@ export async function createMemberWithLoan(data: {
     member.isActive = false;
   }
 
-  if (member.droppingDate !== undefined) {
+  if (member.droppingDate !== undefined && member.droppingDate !== null) {
     const requestDate = new Date(member.droppingDate);
     const joinDate = new Date(member.droppingDate);
     joinDate.setDate(joinDate.getDate() - 4);
@@ -309,10 +309,15 @@ export async function addLoanToMember(id: string, data: typeof loans.$inferInser
     throw new Error("Member not found.");
   }
 
-  await calculateExistingMemberDeposit(id, data.loan, mandatoryDeposit);
+  const depositValues = await calculateExistingMemberDeposit(id, data.loan, mandatoryDeposit);
   data.depositId = member.deposit.id;
 
+  if (!member.isActive && depositValues.principalDeposit === 50_000) {
+    await updateMember(id, { isActive: true });
+  }
+
   const memberTx = await db.transaction(async (tx) => {
+    await tx.update(deposits).set(depositValues).where(eq(deposits.memberId, id)).returning();
     await tx.insert(loans).values(data);
     return db.query.members.findFirst({
       where: eq(members.id, id),
@@ -391,6 +396,10 @@ export async function calculateExistingMemberDeposit(id: string, loan: number, m
   let remainingAdminFee = adminFee;
   let newVoluntaryDeposit = 0;
 
+  if (adminFee < mandatoryDeposit) {
+    throw new Error("Admin fee is less than mandatory deposit");
+  }
+
   if (principalDeposit < MAX_PRINCIPAL_DEPOSIT) {
     if (adminFee > MAX_PRINCIPAL_DEPOSIT) {
       principalDeposit = MAX_PRINCIPAL_DEPOSIT;
@@ -398,12 +407,12 @@ export async function calculateExistingMemberDeposit(id: string, loan: number, m
       newMandatoryDeposit = remainingAdminFee > mandatoryDeposit ? mandatoryDeposit : remainingAdminFee;
       newVoluntaryDeposit = remainingAdminFee - newMandatoryDeposit;
     } else {
-      principalDeposit = adminFee;
+      principalDeposit += adminFee;
       newMandatoryDeposit = 0;
     }
   } else {
     principalDeposit = MAX_PRINCIPAL_DEPOSIT;
-    newVoluntaryDeposit = adminFee - principalDeposit - mandatoryDeposit;
+    newVoluntaryDeposit = adminFee - mandatoryDeposit;
   }
 
   return {

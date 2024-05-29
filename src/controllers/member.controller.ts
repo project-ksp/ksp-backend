@@ -228,7 +228,8 @@ export async function addDeposit(request: FastifyRequest<AddLoanMemberSchema>, r
 
 export async function addLoan(request: FastifyRequest<AddLoanMemberSchema>, reply: FastifyReply) {
   const { id } = request.params;
-  const validated = addLoanSchema.safeParse(request.body);
+  const { loan, mandatoryDeposit } = request.body;
+  const validated = addLoanSchema.safeParse(loan);
   if (!validated.success) {
     return reply.status(400).send({
       message: fromError(validated.error).toString(),
@@ -236,7 +237,7 @@ export async function addLoan(request: FastifyRequest<AddLoanMemberSchema>, repl
   }
 
   try {
-    const data = await memberService.addLoanToMember(id, validated.data);
+    const data = await memberService.addLoanToMember(id, validated.data, mandatoryDeposit);
     reply.send({
       message: "Loan successfully added to member.",
       data,

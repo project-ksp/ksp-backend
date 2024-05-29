@@ -1,4 +1,4 @@
-import { bigint, pgTable, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import { bigint, pgTable, serial, timestamp, varchar, date } from "drizzle-orm/pg-core";
 import { deposits } from "./deposits.schema";
 import { relations } from "drizzle-orm";
 import { leaders } from "./leaders.schema";
@@ -19,8 +19,8 @@ export const loans = pgTable("loans", {
     .references(() => branches.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-  startDate: timestamp("start_date").defaultNow(),
-  endDate: timestamp("end_date"),
+  startDate: date("start_date").defaultNow(),
+  endDate: date("end_date"),
 });
 
 export const loansRelations = relations(loans, ({ one }) => ({

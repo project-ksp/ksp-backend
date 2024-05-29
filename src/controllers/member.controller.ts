@@ -13,8 +13,6 @@ import type {
   SearchMemberSchema,
   ShowMemberSchema,
   UpdateMemberSchema,
-  UpdateStatusMemberSchema,
-  VerifyMemberSchema,
 } from "@/schemas/member.schema";
 import { addDepositSchema, insertMemberSchema, updateMemberSchema } from "@/db/schemas";
 import { fromError } from "zod-validation-error";
@@ -24,7 +22,7 @@ export async function index(request: FastifyRequest<IndexMemberSchema>, reply: F
   const { page } = request.query;
 
   try {
-    const data = await memberService.getAllMembersWithPagination(page, { where: { verified: true } });
+    const data = await memberService.getAllMembersWithPagination(page);
     reply.send({
       message: "Members successfully fetched.",
       data,
@@ -45,7 +43,7 @@ export async function indexRecap(request: FastifyRequest, reply: FastifyReply) {
   }
 
   const data = await memberService.getAllMembers({
-    where: { branchId: request.user.branchId, isActive: true, verified: true },
+    where: { branchId: request.user.branchId, isActive: true },
     limit: branch.publishAmount,
   });
 
@@ -57,7 +55,7 @@ export async function indexRecap(request: FastifyRequest, reply: FastifyReply) {
 
 export async function indexPending(request: FastifyRequest, reply: FastifyReply) {
   const data = await memberService.getAllMembers({
-    where: { branchId: request.user.branchId, verified: false },
+    where: { branchId: request.user.branchId },
   });
   return reply.send({
     message: "Members successfully fetched.",
@@ -80,7 +78,7 @@ export async function search(request: FastifyRequest<SearchMemberSchema>, reply:
 
   try {
     const data = await memberService.getAllMembers({
-      where: { branchId: request.user.branchId, verified: true },
+      where: { branchId: request.user.branchId },
       query: { id: query },
     });
     reply.send({
@@ -150,7 +148,7 @@ export async function createWithDeposit(request: FastifyRequest<CreateDepositMem
 }
 
 export async function createWithLoan(request: FastifyRequest<CreateLoanMemberSchema>, reply: FastifyReply) {
-  const { member, loan } = request.body;
+  const { member, loan, mandatoryDeposit } = request.body;
 
   const validatedMember = insertMemberSchema.safeParse(member);
   if (!validatedMember.success) {
@@ -170,6 +168,7 @@ export async function createWithLoan(request: FastifyRequest<CreateLoanMemberSch
     const memberRet = await memberService.createMemberWithLoan({
       member: { ...validatedMember.data, branchId: request.user.branchId, userId: request.user.id },
       loan: { ...validatedLoan.data, branchId: request.user.branchId },
+      mandatoryDeposit: mandatoryDeposit ?? 0,
     });
     reply.send({
       message: "Member successfully created.",
@@ -197,46 +196,6 @@ export async function update(request: FastifyRequest<UpdateMemberSchema>, reply:
     reply.send({
       message: "Member successfully updated.",
       data: member,
-    });
-  } catch (error) {
-    return reply.status(400).send({
-      message: error instanceof Error ? error.message : "An error occurred.",
-    });
-  }
-}
-
-export async function updateStatus(request: FastifyRequest<UpdateStatusMemberSchema>, reply: FastifyReply) {
-  const { id } = request.params;
-  const { status } = request.body;
-
-  try {
-    const data = await memberService.updateMember(id, { status });
-    reply.send({
-      message: "Member status successfully updated.",
-      data,
-    });
-  } catch (error) {
-    return reply.status(400).send({
-      message: error instanceof Error ? error.message : "An error occurred.",
-    });
-  }
-}
-
-export async function verify(request: FastifyRequest<VerifyMemberSchema>, reply: FastifyReply) {
-  const { id } = request.params;
-
-  const member = await memberService.getMemberById(id);
-  if (!member || member.status !== "disetujui") {
-    return reply.status(400).send({
-      message: "Member not found or not approved.",
-    });
-  }
-
-  try {
-    const data = await memberService.updateMember(id, { verified: true });
-    reply.send({
-      message: "Member successfully verified.",
-      data,
     });
   } catch (error) {
     return reply.status(400).send({

@@ -17,12 +17,8 @@ COPY . .
 RUN yarn build
 COPY ./src/storage ./dist/storage
 
-# Run migrations and seed the database
-RUN yarn migrate
-RUN yarn seed
-
 # Expose the port the server uses
 EXPOSE 8080
 
 # Command to start the app
-CMD ["yarn", "start"]
+CMD ["yarn", "migrate", "&&", "yarn", "seed", "&&", "yarn", "start"]

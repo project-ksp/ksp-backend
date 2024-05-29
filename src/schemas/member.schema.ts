@@ -61,6 +61,14 @@ export const addLoanMemberSchema = {
       id: { type: "string" },
     },
   } as const,
+  body: {
+    type: "object",
+    required: ["loan", "mandatoryDeposit"],
+    properties: {
+      loan: { type: "object" },
+      mandatoryDeposit: { type: "number" },
+    },
+  } as const,
 };
 
 export const updateMemberSchema = {

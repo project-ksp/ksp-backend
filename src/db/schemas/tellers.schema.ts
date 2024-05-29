@@ -17,7 +17,7 @@ export const tellers = pgTable("tellers", {
   kelurahan: varchar("kelurahan", { length: 256 }).notNull(),
   kecamatan: varchar("kecamatan", { length: 256 }).notNull(),
   city: varchar("city", { length: 256 }).notNull(),
-  phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+  phoneNumber: varchar("phone_number", { length: 20 }).notNull().default(""),
   education: educationEnum("education").notNull(),
   idPictureUrl: varchar("id_picture_url", { length: 256 }).notNull(),
   branchId: serial("branch_id").references(() => branches.id),

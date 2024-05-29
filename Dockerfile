@@ -23,4 +23,7 @@ EXPOSE 8080
 RUN chmod +x /usr/src/app/entrypoint.sh
 
 # Command to start the app
+# Add Environment Variable called 'ENV' for your deployment type on your compose or orchestrator. example:
+# ENV=sit (for testing)
+# ENV=prod (for production)
 CMD ["/usr/src/app/entrypoint.sh"]

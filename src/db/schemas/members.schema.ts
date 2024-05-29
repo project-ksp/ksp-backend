@@ -39,7 +39,7 @@ export const members = pgTable("members", {
 
   joinDate: date("join_date", { mode: "string" }),
   requestDate: date("request_date", { mode: "string" }),
-  droppingDate: date("dropping_date", { mode: "string" }).notNull().defaultNow(),
+  droppingDate: date("dropping_date", { mode: "string" }),
 });
 
 export const membersRelations = relations(members, ({ one }) => ({

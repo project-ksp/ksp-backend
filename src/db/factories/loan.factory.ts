@@ -11,7 +11,7 @@ export default async function loanFactory(): Promise<typeof loans.$inferInsert> 
       max: 10000000,
     }),
     leaderId: "",
-    startDate: new Date(),
-    endDate,
+    startDate: new Date().toISOString(),
+    endDate: endDate.toISOString(),
   };
 }

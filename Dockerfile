@@ -19,6 +19,9 @@ RUN yarn build
 # Expose the port the server uses
 EXPOSE 8080
 
+# Copy storage from src to dist
+COPY ./src/storage ./dist/storage
+
 # making sure that the entrypoint script is executable
 RUN chmod +x /usr/src/app/entrypoint.sh
 

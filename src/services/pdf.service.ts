@@ -49,7 +49,7 @@ export async function generateMemberCard(id: string) {
     font: helveticaFont,
   });
 
-  page.drawText(member.branchId.toString(), {
+  page.drawText(member.branch.address, {
     x: 21,
     y: 13,
     size: 8,

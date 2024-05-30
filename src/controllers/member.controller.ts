@@ -78,7 +78,6 @@ export async function search(request: FastifyRequest<SearchMemberSchema>, reply:
 
   try {
     const data = await memberService.getAllMembers({
-      where: { branchId: request.user.branchId },
       query: { id: query },
     });
     reply.send({

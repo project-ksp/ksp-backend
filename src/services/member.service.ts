@@ -94,6 +94,7 @@ export async function getAllMembersWithDeletion({
         columns: {
           reason: true,
           updatedAt: true,
+          status: true,
         },
       },
     },
@@ -221,7 +222,7 @@ export async function createMemberWithLoan(data: {
   if (member.droppingDate !== undefined && member.droppingDate !== null) {
     const requestDate = new Date(member.droppingDate);
     const joinDate = new Date(member.droppingDate);
-    joinDate.setDate(joinDate.getDate() - 4);
+    joinDate.setDate(joinDate.getDate() - 7);
     requestDate.setDate(requestDate.getDate() - 7);
     member.requestDate = requestDate.toISOString();
     member.joinDate = joinDate.toISOString();
@@ -436,10 +437,10 @@ async function generateId(data: Omit<typeof members.$inferInsert, "id">) {
 
   const regionId = data.nik.startsWith("35") ? "01" : "02";
 
-  let id = `${regionId}.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
+  let id = `${regionId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
   while (await db.query.members.findFirst({ where: eq(members.id, id) })) {
     value++;
-    id = `${regionId}.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
+    id = `${regionId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
   }
 
   return id;

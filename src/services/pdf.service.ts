@@ -271,15 +271,15 @@ export async function generateRegistrationForm(id: string) {
       month: "long",
     }),
     {
-      x: 463,
-      y: height - 747,
+      x: 460,
+      y: height - 746,
       size: 9,
       font: helveticaFont,
     },
   );
   pages[0]!.drawText(joinYear, {
     x: 533,
-    y: height - 747,
+    y: height - 746,
     size: 9,
     font: helveticaFont,
   });
@@ -311,7 +311,34 @@ export async function generateRegistrationForm(id: string) {
     size: 10,
     font: helveticaFont,
   });
-
+  pages[1]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      day: "numeric",
+    }),
+    {
+      x: 260,
+      y: height - 536,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[1]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      month: "long",
+    }),
+    {
+      x: 280,
+      y: height - 536,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[1]!.drawText(joinYear, {
+    x: 365,
+    y: height - 536,
+    size: 9,
+    font: helveticaFont,
+  });
   pages[2]!.drawText(leader.name, {
     x: 157,
     y: height - 196,
@@ -354,6 +381,35 @@ export async function generateRegistrationForm(id: string) {
     font: helveticaFont,
   });
 
+  pages[2]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      day: "numeric",
+    }),
+    {
+      x: 395,
+      y: height - 601,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[2]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      month: "long",
+    }),
+    {
+      x: 413,
+      y: height - 601,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[2]!.drawText(joinYear, {
+    x: 483,
+    y: height - 601,
+    size: 9,
+    font: helveticaFont,
+  });
+
   pages[3]!.drawText(member.name, {
     x: 157,
     y: height - 261,
@@ -379,6 +435,35 @@ export async function generateRegistrationForm(id: string) {
     x: 157,
     y: height - 327,
     size: 10,
+    font: helveticaFont,
+  });
+
+  pages[3]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      day: "numeric",
+    }),
+    {
+      x: 450,
+      y: height - 648,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[3]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      month: "long",
+    }),
+    {
+      x: 468,
+      y: height - 648,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[3]!.drawText(joinYear, {
+    x: 535,
+    y: height - 648,
+    size: 9,
     font: helveticaFont,
   });
 

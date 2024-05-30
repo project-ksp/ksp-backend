@@ -399,7 +399,6 @@ export async function generateMemberListBook(branchId: number) {
     }),
     memberService.getAllMembersWithDeletion({
       where: { branchId, isActive: false },
-      limit: branch.publishAmount,
     }),
   ]);
 
@@ -506,8 +505,6 @@ export async function generateMemberListBook(branchId: number) {
           font: helveticaFont,
         },
       );
-      console.log(`${currentMember + 1}/${members.length}`);
-
       const ttdImage = await pdfDoc.embedPng(ttdImageBuffer);
 
       page.drawImage(ttdImage, {
@@ -517,7 +514,7 @@ export async function generateMemberListBook(branchId: number) {
         height: 15,
       });
 
-      if (member?.deleteRequests.status === "disetujui") {
+      if (member?.deleteRequests?.status === "disetujui") {
         page.drawText(
           new Date(member.deleteRequests.updatedAt).toLocaleDateString("id-ID", {
             day: "numeric",

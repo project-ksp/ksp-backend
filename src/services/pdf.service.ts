@@ -4,6 +4,7 @@ import { PDFDocument, StandardFonts } from "pdf-lib";
 import * as memberService from "@/services/member.service";
 import * as leaderService from "@/services/leader.service";
 import * as branchService from "@/services/branch.service";
+import { Logger } from "@/utils";
 
 const DOCUMENTS_DIRECTORY = path.join(__dirname, "../storage/public/documents");
 const TEXT_FONT = StandardFonts.Helvetica;
@@ -500,15 +501,12 @@ export async function generateMemberListBook(branchId: number) {
           font: helveticaFont,
         });
 
-        page.drawText(
-          member.deleteRequests.reason,
-          {
-            x: 797,
-            y,
-            size: 6,
-            font: helveticaFont,
-          },
-        );
+        page.drawText(member.deleteRequests.reason, {
+          x: 797,
+          y,
+          size: 6,
+          font: helveticaFont,
+        });
       }
 
       y -= 25;
@@ -529,6 +527,7 @@ async function readDocument(name: string) {
   try {
     return fs.readFileSync(path.join(DOCUMENTS_DIRECTORY, name));
   } catch (error) {
+    Logger.error("READ", `Failed to read document: ${String(error)}`);
     throw new Error("Document not found.");
   }
 }

@@ -49,7 +49,7 @@ export async function generateMemberCard(id: string) {
     font: helveticaFont,
   });
 
-  page.drawText(member.branchId.toString(), {
+  page.drawText(member.branch.address, {
     x: 21,
     y: 13,
     size: 8,
@@ -271,15 +271,15 @@ export async function generateRegistrationForm(id: string) {
       month: "long",
     }),
     {
-      x: 463,
-      y: height - 747,
+      x: 460,
+      y: height - 746,
       size: 9,
       font: helveticaFont,
     },
   );
   pages[0]!.drawText(joinYear, {
     x: 533,
-    y: height - 747,
+    y: height - 746,
     size: 9,
     font: helveticaFont,
   });
@@ -311,7 +311,34 @@ export async function generateRegistrationForm(id: string) {
     size: 10,
     font: helveticaFont,
   });
-
+  pages[1]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      day: "numeric",
+    }),
+    {
+      x: 260,
+      y: height - 536,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[1]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      month: "long",
+    }),
+    {
+      x: 280,
+      y: height - 536,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[1]!.drawText(joinYear, {
+    x: 365,
+    y: height - 536,
+    size: 9,
+    font: helveticaFont,
+  });
   pages[2]!.drawText(leader.name, {
     x: 157,
     y: height - 196,
@@ -354,6 +381,35 @@ export async function generateRegistrationForm(id: string) {
     font: helveticaFont,
   });
 
+  pages[2]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      day: "numeric",
+    }),
+    {
+      x: 395,
+      y: height - 601,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[2]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      month: "long",
+    }),
+    {
+      x: 413,
+      y: height - 601,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[2]!.drawText(joinYear, {
+    x: 483,
+    y: height - 601,
+    size: 9,
+    font: helveticaFont,
+  });
+
   pages[3]!.drawText(member.name, {
     x: 157,
     y: height - 261,
@@ -382,6 +438,35 @@ export async function generateRegistrationForm(id: string) {
     font: helveticaFont,
   });
 
+  pages[3]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      day: "numeric",
+    }),
+    {
+      x: 450,
+      y: height - 648,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[3]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      month: "long",
+    }),
+    {
+      x: 468,
+      y: height - 648,
+      size: 10,
+      font: helveticaFont,
+    },
+  );
+  pages[3]!.drawText(joinYear, {
+    x: 535,
+    y: height - 648,
+    size: 9,
+    font: helveticaFont,
+  });
+
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
 }
@@ -399,7 +484,6 @@ export async function generateMemberListBook(branchId: number) {
     }),
     memberService.getAllMembersWithDeletion({
       where: { branchId, isActive: false },
-      limit: branch.publishAmount,
     }),
   ]);
 
@@ -506,8 +590,6 @@ export async function generateMemberListBook(branchId: number) {
           font: helveticaFont,
         },
       );
-      console.log(`${currentMember + 1}/${members.length}`);
-
       const ttdImage = await pdfDoc.embedPng(ttdImageBuffer);
 
       page.drawImage(ttdImage, {
@@ -517,7 +599,7 @@ export async function generateMemberListBook(branchId: number) {
         height: 15,
       });
 
-      if (member?.deleteRequests.status === "disetujui") {
+      if (member?.deleteRequests?.status === "disetujui") {
         page.drawText(
           new Date(member.deleteRequests.updatedAt).toLocaleDateString("id-ID", {
             day: "numeric",

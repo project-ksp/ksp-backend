@@ -143,6 +143,11 @@ export async function getMemberById(id: string) {
           loans: true,
         },
       },
+      branch: {
+        columns: {
+          address: true,
+        },
+      },
     },
   });
 }

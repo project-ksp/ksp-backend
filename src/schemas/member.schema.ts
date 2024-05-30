@@ -48,6 +48,7 @@ export const createLoanMemberSchema = {
     properties: {
       member: { type: "object" },
       loan: { type: "object" },
+      mandatoryDeposit: { type: "number" },
     },
   } as const,
 };
@@ -58,6 +59,14 @@ export const addLoanMemberSchema = {
     required: ["id"],
     properties: {
       id: { type: "string" },
+    },
+  } as const,
+  body: {
+    type: "object",
+    required: ["loan", "mandatoryDeposit"],
+    properties: {
+      loan: { type: "object" },
+      mandatoryDeposit: { type: "number" },
     },
   } as const,
 };
@@ -105,6 +114,7 @@ export const calculateDepositMemberSchema = {
     required: ["loan"],
     properties: {
       loan: { type: "number" },
+      mandatoryDeposit: { type: "number" },
     },
   } as const,
 };
@@ -122,6 +132,7 @@ export const calculateDepositExistingMemberSchema = {
     required: ["loan"],
     properties: {
       loan: { type: "number" },
+      mandatoryDeposit: { type: "number" },
     },
   } as const,
 };

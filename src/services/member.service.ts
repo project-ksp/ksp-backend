@@ -7,9 +7,8 @@ import * as uploadService from "./upload.service";
 import type { z } from "zod";
 
 const ADMIN_PERCENTAGE = 0.05;
-const MINIMUM_PRINCIPAL_DEPOSIT = 50000;
-const MONTHLY_DEPOSIT = 5000;
-const LOAN_PERIOD_MONTHS = 6;
+const MAX_PRINCIPAL_DEPOSIT = 50_000;
+const MIN_MANDATORY_DEPOSIT = 5_000;
 
 export async function getAllMembers({
   where = {},
@@ -95,6 +94,7 @@ export async function getAllMembersWithDeletion({
         columns: {
           reason: true,
           updatedAt: true,
+          status: true,
         },
       },
     },
@@ -207,12 +207,26 @@ export async function createMemberWithDeposit(data: {
 export async function createMemberWithLoan(data: {
   member: Omit<typeof members.$inferInsert, "id">;
   loan: typeof loans.$inferInsert;
+  mandatoryDeposit: number;
 }) {
   const { member, loan } = data;
-  const depositValues = await calculateNewMemberDeposit(loan.loan);
+  const depositValues = await calculateNewMemberDeposit(loan.loan, data.mandatoryDeposit);
 
   const id = await generateId(member);
   member.idPictureUrl = uploadService.persistTemporaryFile(member.idPictureUrl);
+
+  if (loan.loan < 1_000_000) {
+    member.isActive = false;
+  }
+
+  if (member.droppingDate !== undefined && member.droppingDate !== null) {
+    const requestDate = new Date(member.droppingDate);
+    const joinDate = new Date(member.droppingDate);
+    joinDate.setDate(joinDate.getDate() - 7);
+    requestDate.setDate(requestDate.getDate() - 7);
+    member.requestDate = requestDate.toISOString();
+    member.joinDate = joinDate.toISOString();
+  }
 
   try {
     const memberReturned = await db.transaction(async (tx) => {
@@ -240,7 +254,6 @@ export async function createMemberWithLoan(data: {
       }
 
       loan.depositId = depositRet.id;
-      loan.verified = true;
       await tx.insert(loans).values(loan);
 
       return memberRet;
@@ -280,7 +293,7 @@ export async function addDepositToMember(id: string, data: z.infer<typeof addDep
   return getMemberById(id);
 }
 
-export async function addLoanToMember(id: string, data: typeof loans.$inferInsert) {
+export async function addLoanToMember(id: string, data: typeof loans.$inferInsert, mandatoryDeposit = 0) {
   const member = await db.query.members.findFirst({
     where: eq(members.id, id),
     with: {
@@ -297,14 +310,15 @@ export async function addLoanToMember(id: string, data: typeof loans.$inferInser
     throw new Error("Member not found.");
   }
 
-  await calculateExistingMemberDeposit(id, data.loan);
+  const depositValues = await calculateExistingMemberDeposit(id, data.loan, mandatoryDeposit);
   data.depositId = member.deposit.id;
 
-  const memberTx = await db.transaction(async (tx) => {
-    if (member.deposit.loans[0] && !member.deposit.loans[0].verified) {
-      await tx.delete(loans).where(eq(loans.id, member.deposit.loans[0].id));
-    }
+  if (!member.isActive && depositValues.principalDeposit === MAX_PRINCIPAL_DEPOSIT) {
+    await updateMember(id, { isActive: true });
+  }
 
+  const memberTx = await db.transaction(async (tx) => {
+    await tx.update(deposits).set(depositValues).where(eq(deposits.memberId, id)).returning();
     await tx.insert(loans).values(data);
     return db.query.members.findFirst({
       where: eq(members.id, id),
@@ -334,25 +348,34 @@ export async function updateMember(id: string, data: Partial<typeof members.$inf
   return member;
 }
 
-export async function calculateNewMemberDeposit(loan: number) {
-  if (loan * ADMIN_PERCENTAGE < MINIMUM_PRINCIPAL_DEPOSIT) {
-    throw new Error(
-      `Minimum principal deposit is not met. Minimum loan is ${MINIMUM_PRINCIPAL_DEPOSIT / ADMIN_PERCENTAGE}.`,
-    );
+export async function calculateNewMemberDeposit(loan: number, mandatoryDeposit = 0) {
+  const adminFee = loan * ADMIN_PERCENTAGE;
+  let principalDeposit = MAX_PRINCIPAL_DEPOSIT;
+  let voluntaryDeposit = 0;
+
+  if (adminFee > MAX_PRINCIPAL_DEPOSIT && mandatoryDeposit < MIN_MANDATORY_DEPOSIT) {
+    throw new Error(`Minimum mandatory deposit is not met. Minimum mandatory deposit is ${MIN_MANDATORY_DEPOSIT}.`);
   }
 
-  const monthCount = Math.min(Math.floor((loan * ADMIN_PERCENTAGE - MINIMUM_PRINCIPAL_DEPOSIT) / MONTHLY_DEPOSIT), 6);
-  const mandatoryDeposit = monthCount * MONTHLY_DEPOSIT;
-  const voluntaryDeposit = loan * ADMIN_PERCENTAGE - MINIMUM_PRINCIPAL_DEPOSIT - mandatoryDeposit;
+  if (adminFee <= MAX_PRINCIPAL_DEPOSIT) {
+    principalDeposit = adminFee;
+    if (mandatoryDeposit > 0) {
+      throw new Error("Principal deposit is not enough to cover mandatory deposit.");
+    }
+  } else {
+    const remainingAdminFee = adminFee - MAX_PRINCIPAL_DEPOSIT;
+    mandatoryDeposit = mandatoryDeposit <= remainingAdminFee ? mandatoryDeposit : remainingAdminFee;
+    voluntaryDeposit = remainingAdminFee - mandatoryDeposit;
+  }
 
   return {
-    principalDeposit: MINIMUM_PRINCIPAL_DEPOSIT,
+    principalDeposit,
     mandatoryDeposit,
     voluntaryDeposit,
   };
 }
 
-export async function calculateExistingMemberDeposit(id: string, loan: number) {
+export async function calculateExistingMemberDeposit(id: string, loan: number, mandatoryDeposit = 0) {
   const member = await db.query.members.findFirst({
     where: eq(members.id, id),
     with: {
@@ -370,34 +393,33 @@ export async function calculateExistingMemberDeposit(id: string, loan: number) {
     throw new Error("Member not found.");
   }
 
-  const adminCost = loan * ADMIN_PERCENTAGE;
+  const adminFee = loan * ADMIN_PERCENTAGE;
+  let { principalDeposit } = member.deposit;
+  let newMandatoryDeposit = mandatoryDeposit;
+  let newVoluntaryDeposit = 0;
 
-  const loanCount =
-    member.deposit.loans[0] && !member.deposit.loans[0].verified
-      ? member.deposit.loans.length - 1
-      : member.deposit.loans.length;
-
-  const shouldBeMandatoryDeposited = loanCount * (MONTHLY_DEPOSIT * LOAN_PERIOD_MONTHS);
-
-  const mandatoryDepositRemaining = Math.max(shouldBeMandatoryDeposited - member.deposit.mandatoryDeposit, 0);
-  if (adminCost < mandatoryDepositRemaining) {
-    throw new Error(
-      `Minimum principal deposit is not met. Minimum loan is ${mandatoryDepositRemaining / ADMIN_PERCENTAGE}.`,
-    );
+  if (adminFee < mandatoryDeposit) {
+    throw new Error("Admin fee is less than mandatory deposit");
   }
 
-  const shouldBeMandatoryDepositedAfter = (loanCount + 1) * (MONTHLY_DEPOSIT * LOAN_PERIOD_MONTHS);
-  const mandatoryDepositRemainingAfter = Math.max(shouldBeMandatoryDepositedAfter - member.deposit.mandatoryDeposit, 0);
-
-  const ableToDeposit = Math.min(adminCost, mandatoryDepositRemainingAfter);
-
-  const mandatoryDeposit = ableToDeposit;
-  const voluntaryDeposit = adminCost - ableToDeposit;
+  if (principalDeposit < MAX_PRINCIPAL_DEPOSIT) {
+    if (adminFee + principalDeposit > MAX_PRINCIPAL_DEPOSIT) {
+      const remainingAdminFee = adminFee - (MAX_PRINCIPAL_DEPOSIT - principalDeposit);
+      newMandatoryDeposit = mandatoryDeposit <= remainingAdminFee ? mandatoryDeposit : remainingAdminFee;
+      newVoluntaryDeposit = remainingAdminFee - newMandatoryDeposit;
+      principalDeposit = MAX_PRINCIPAL_DEPOSIT;
+    } else {
+      principalDeposit += adminFee;
+    }
+  } else {
+    principalDeposit = MAX_PRINCIPAL_DEPOSIT;
+    newVoluntaryDeposit = adminFee - mandatoryDeposit;
+  }
 
   return {
-    principalDeposit: MINIMUM_PRINCIPAL_DEPOSIT,
-    mandatoryDeposit: member.deposit.mandatoryDeposit + mandatoryDeposit,
-    voluntaryDeposit: member.deposit.voluntaryDeposit + voluntaryDeposit,
+    principalDeposit,
+    mandatoryDeposit: member.deposit.mandatoryDeposit + newMandatoryDeposit,
+    voluntaryDeposit: member.deposit.voluntaryDeposit + newVoluntaryDeposit,
   };
 }
 
@@ -415,10 +437,10 @@ async function generateId(data: Omit<typeof members.$inferInsert, "id">) {
 
   const regionId = data.nik.startsWith("35") ? "01" : "02";
 
-  let id = `${regionId}.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
+  let id = `${regionId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
   while (await db.query.members.findFirst({ where: eq(members.id, id) })) {
     value++;
-    id = `${regionId}.${branchId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
+    id = `${regionId}.${leaderId}.${(value + 1).toString().padStart(5, "0")}`;
   }
 
   return id;

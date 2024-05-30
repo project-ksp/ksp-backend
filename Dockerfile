@@ -15,10 +15,18 @@ COPY . .
 
 # Build the application
 RUN yarn build
-COPY ./src/storage ./dist/storage
 
 # Expose the port the server uses
 EXPOSE 8080
 
+# Copy storage from src to dist
+COPY ./src/storage ./dist/storage
+
+# making sure that the entrypoint script is executable
+RUN chmod +x /usr/src/app/entrypoint.sh
+
 # Command to start the app
-CMD ["yarn", "start"]
+# Add Environment Variable called 'ENV' for your deployment type on your compose or orchestrator. example:
+# ENV=sit (for testing)
+# ENV=prod (for production)
+CMD ["/usr/src/app/entrypoint.sh"]

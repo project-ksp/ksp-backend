@@ -4,6 +4,7 @@ import { PDFDocument, StandardFonts } from "pdf-lib";
 import * as memberService from "@/services/member.service";
 import * as leaderService from "@/services/leader.service";
 import * as branchService from "@/services/branch.service";
+import { Logger } from "@/utils";
 
 const DOCUMENTS_DIRECTORY = path.join(__dirname, "../storage/public/documents");
 const TEXT_FONT = StandardFonts.Helvetica;
@@ -261,6 +262,28 @@ export async function generateRegistrationForm(id: string) {
     font: helveticaFont,
   });
 
+  const joinDate = member.joinDate ?? new Date().toISOString();
+  const joinYear = new Date(joinDate).getFullYear().toString().slice(-2);
+
+  pages[0]!.drawText(
+    new Date(joinDate).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+    }),
+    {
+      x: 463,
+      y: height - 747,
+      size: 9,
+      font: helveticaFont,
+    },
+  );
+  pages[0]!.drawText(joinYear, {
+    x: 533,
+    y: height - 747,
+    size: 9,
+    font: helveticaFont,
+  });
+
   pages[1]!.drawText(member.name, {
     x: 157,
     y: height - 224,
@@ -369,14 +392,20 @@ export async function generateMemberListBook(branchId: number) {
     throw new Error("Branch not found.");
   }
 
-  const members = await memberService.getAllMembersWithDeletion({
-    where: { branchId },
-  });
-  if (members.length === 0) {
-    throw new Error("No members found.");
-  }
+  const allMembers = await Promise.all([
+    memberService.getAllMembersWithDeletion({
+      where: { branchId, isActive: true },
+      limit: branch.publishAmount,
+    }),
+    memberService.getAllMembersWithDeletion({
+      where: { branchId, isActive: false },
+      limit: branch.publishAmount,
+    }),
+  ]);
 
+  const members = allMembers[0].concat(allMembers[1]);
   const buffer = await readDocument("Buku Daftar Anggota.pdf");
+  const ttdImageBuffer = await readImage("TTD_Ketua.png");
 
   const pdfDoc = await PDFDocument.load(buffer);
   const helveticaFont = await pdfDoc.embedFont(TEXT_FONT);
@@ -477,8 +506,18 @@ export async function generateMemberListBook(branchId: number) {
           font: helveticaFont,
         },
       );
+      console.log(`${currentMember + 1}/${members.length}`);
 
-      if (member?.deleteRequests) {
+      const ttdImage = await pdfDoc.embedPng(ttdImageBuffer);
+
+      page.drawImage(ttdImage, {
+        x: 715,
+        y,
+        width: 15,
+        height: 15,
+      });
+
+      if (member?.deleteRequests.status === "disetujui") {
         page.drawText(
           new Date(member.deleteRequests.updatedAt).toLocaleDateString("id-ID", {
             day: "numeric",
@@ -500,15 +539,12 @@ export async function generateMemberListBook(branchId: number) {
           font: helveticaFont,
         });
 
-        page.drawText(
-          member.deleteRequests.reason,
-          {
-            x: 797,
-            y,
-            size: 6,
-            font: helveticaFont,
-          },
-        );
+        page.drawImage(ttdImage, {
+          x: 875,
+          y,
+          width: 15,
+          height: 15,
+        });
       }
 
       y -= 25;
@@ -529,6 +565,16 @@ async function readDocument(name: string) {
   try {
     return fs.readFileSync(path.join(DOCUMENTS_DIRECTORY, name));
   } catch (error) {
+    Logger.error("READ", `Failed to read document: ${String(error)}`);
     throw new Error("Document not found.");
+  }
+}
+
+async function readImage(name: string) {
+  try {
+    return fs.readFileSync(path.join(DOCUMENTS_DIRECTORY, name));
+  } catch (error) {
+    Logger.error("READ", `Failed to read image: ${String(error)}`);
+    throw new Error("Image not found.");
   }
 }

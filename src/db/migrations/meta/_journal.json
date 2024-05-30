@@ -225,6 +225,34 @@
       "when": 1716611550752,
       "tag": "0031_faithful_drax",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1716987526108,
+      "tag": "0032_common_punisher",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "5",
+      "when": 1716987844011,
+      "tag": "0033_rapid_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1716988067259,
+      "tag": "0034_big_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1717006945455,
+      "tag": "0035_last_blonde_phantom",
+      "breakpoints": true
     }
   ]
 }

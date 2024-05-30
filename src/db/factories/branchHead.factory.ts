@@ -4,7 +4,7 @@ import type { branchHeads } from "../schemas";
 
 export default async function branchHeadFactory(): Promise<typeof branchHeads.$inferInsert> {
   return {
-    name: faker.person.fullName(),
+    name: "Cabang Pusat",
     birthPlace: faker.location.city(),
     birthDate: faker.date.past().toISOString().split("T")[0]!,
     gender: genderEnum.enumValues[faker.number.int(genderEnum.enumValues.length)] ?? "laki-laki",

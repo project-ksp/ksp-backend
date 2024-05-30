@@ -312,7 +312,7 @@ export async function addLoanToMember(id: string, data: typeof loans.$inferInser
   const depositValues = await calculateExistingMemberDeposit(id, data.loan, mandatoryDeposit);
   data.depositId = member.deposit.id;
 
-  if (!member.isActive && depositValues.principalDeposit === 50_000) {
+  if (!member.isActive && depositValues.principalDeposit === MAX_PRINCIPAL_DEPOSIT) {
     await updateMember(id, { isActive: true });
   }
 
@@ -362,7 +362,9 @@ export async function calculateNewMemberDeposit(loan: number, mandatoryDeposit =
       throw new Error("Principal deposit is not enough to cover mandatory deposit.");
     }
   } else {
-    voluntaryDeposit = adminFee - MAX_PRINCIPAL_DEPOSIT - mandatoryDeposit;
+    const remainingAdminFee = adminFee - MAX_PRINCIPAL_DEPOSIT;
+    mandatoryDeposit = mandatoryDeposit <= remainingAdminFee ? mandatoryDeposit : remainingAdminFee;
+    voluntaryDeposit = remainingAdminFee - mandatoryDeposit;
   }
 
   return {
@@ -393,7 +395,6 @@ export async function calculateExistingMemberDeposit(id: string, loan: number, m
   const adminFee = loan * ADMIN_PERCENTAGE;
   let { principalDeposit } = member.deposit;
   let newMandatoryDeposit = mandatoryDeposit;
-  let remainingAdminFee = adminFee;
   let newVoluntaryDeposit = 0;
 
   if (adminFee < mandatoryDeposit) {
@@ -401,14 +402,13 @@ export async function calculateExistingMemberDeposit(id: string, loan: number, m
   }
 
   if (principalDeposit < MAX_PRINCIPAL_DEPOSIT) {
-    if (adminFee > MAX_PRINCIPAL_DEPOSIT) {
-      principalDeposit = MAX_PRINCIPAL_DEPOSIT;
-      remainingAdminFee = adminFee - principalDeposit;
-      newMandatoryDeposit = remainingAdminFee > mandatoryDeposit ? mandatoryDeposit : remainingAdminFee;
+    if (adminFee + principalDeposit > MAX_PRINCIPAL_DEPOSIT) {
+      const remainingAdminFee = adminFee - (MAX_PRINCIPAL_DEPOSIT - principalDeposit);
+      newMandatoryDeposit = mandatoryDeposit <= remainingAdminFee ? mandatoryDeposit : remainingAdminFee;
       newVoluntaryDeposit = remainingAdminFee - newMandatoryDeposit;
+      principalDeposit = MAX_PRINCIPAL_DEPOSIT;
     } else {
       principalDeposit += adminFee;
-      newMandatoryDeposit = 0;
     }
   } else {
     principalDeposit = MAX_PRINCIPAL_DEPOSIT;

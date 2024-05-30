@@ -11,28 +11,12 @@ export default async function seed() {
   const owner: typeof users.$inferInsert = {
     username: "owner",
     password: await cipher.encrypt("owner"),
-    name: "Dummy Owner",
+    name: "KSP Sentosa Makmur",
     role: "owner",
     branchId: branch.id,
   };
 
-  const teller: typeof users.$inferInsert = {
-    username: "teller",
-    password: await cipher.encrypt("teller"),
-    name: "Dummy Teller",
-    role: "teller",
-    branchId: branch.id,
-  };
-
-  const branchHead: typeof users.$inferInsert = {
-    username: "kepalacabang",
-    password: await cipher.encrypt("kepalacabang"),
-    name: "Dummy Branch Head",
-    role: "branch_head",
-    branchId: branch.id,
-  };
-
-  await db.insert(users).values([owner, teller, branchHead]);
+  await db.insert(users).values([owner]);
 }
 
 export async function clear() {

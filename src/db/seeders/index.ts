@@ -4,9 +4,9 @@ import { initDb } from "..";
 async function seed() {
   const seeders = {
     branch: await import("./branch.seeder"),
-    // branchHead: await import("./branchHead.seeder"),
+    // Remove for Prod branchHead: await import("./branchHead.seeder"),
     user: await import("./user.seeder"),
-    // leader: await import("./leader.seeder"),
+    // Remove for Prod leader: await import("./leader.seeder"),
     // member: await import("./member.seeder"),
     // teller: await import("./teller.seeder"),
     // deposit: await import("./deposit.seeder"),

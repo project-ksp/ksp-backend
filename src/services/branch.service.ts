@@ -26,7 +26,8 @@ export async function getAllBranches() {
     })
     .from(branches)
     .leftJoin(sq, eq(branches.id, sq.branchId))
-    .leftJoin(branchHeads, eq(branches.id, branchHeads.branchId));
+    .leftJoin(branchHeads, eq(branches.id, branchHeads.branchId))
+    .orderBy(branches.id, "asc");
 }
 
 export async function getBranchById(id: number) {

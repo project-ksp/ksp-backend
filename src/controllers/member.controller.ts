@@ -101,12 +101,6 @@ export async function show(request: FastifyRequest<ShowMemberSchema>, reply: Fas
     });
   }
 
-  if (request.user.role !== "owner" && data.branchId !== request.user.branchId) {
-    return reply.status(403).send({
-      message: "Forbidden.",
-    });
-  }
-
   reply.send({
     message: "Member successfully fetched.",
     data,

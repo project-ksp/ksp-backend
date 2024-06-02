@@ -28,7 +28,7 @@ export async function getAllLoans({ where = {} }: { where?: Partial<typeof loans
   });
 }
 
-export async function updateLoan(id: number, data: Partial<typeof loans.$inferInsert>) {
+export async function updateLoan(id: number, data: Partial<typeof loans.$inferInsert> | undefined) {
   const [loan] = await db
     .update(loans)
     .set({ ...data, updatedAt: new Date() })

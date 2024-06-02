@@ -50,3 +50,9 @@ export const addLoanSchema = createInsertSchema(loans).omit({
   createdAt: true,
   updatedAt: true,
 });
+
+export const updateLoanSchema = createInsertSchema(loans).omit({
+  depositId: true,
+  createdAt: true,
+  updatedAt: true,
+});

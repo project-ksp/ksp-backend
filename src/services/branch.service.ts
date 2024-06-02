@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { branchHeads, branches, leaders, members, users } from "@/db/schemas";
-import { getTableColumns, eq, sql, count } from "drizzle-orm";
+import { getTableColumns, eq, sql, count, asc } from "drizzle-orm";
 
 export async function getAllBranches() {
   const sq = db
@@ -27,7 +27,7 @@ export async function getAllBranches() {
     .from(branches)
     .leftJoin(sq, eq(branches.id, sq.branchId))
     .leftJoin(branchHeads, eq(branches.id, branchHeads.branchId))
-    .orderBy(branches.id, "asc");
+    .orderBy(asc(branches.id));
 }
 
 export async function getBranchById(id: number) {

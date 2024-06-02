@@ -150,7 +150,7 @@ export async function generateRegistrationForm(id: string) {
   const pages = pdfDoc.getPages();
   const { height } = pages[0]!.getSize();
 
-  pages[0]!.drawText(member.id, {
+  pages[0]!.drawText(String(member.branchId), {
     x: 162,
     y: height - 163,
     size: 10,

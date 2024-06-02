@@ -1,4 +1,4 @@
-import type { AccessBranchSchema, LoginSchema } from "@/schemas/auth.schema";
+import type { AccessBranchSchema, LoginSchema, AccessOwnerSchema } from "@/schemas/auth.schema";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import * as userService from "@/services/user.service";
 import * as ownerService from "@/services/owner.service";
@@ -53,6 +53,24 @@ export async function authenticateAsBranchHead(request: FastifyRequest<AccessBra
   if (!user[0]) {
     return reply.status(400).send({
       message: "Branch account not found.",
+    });
+  }
+
+  const { username, password } = user[0];
+  reply.send({
+    message: "Fetched user token successfully",
+    data: { username, password },
+  });
+}
+
+export async function authenticateAsOwner(request: FastifyRequest<AccessOwnerSchema>, reply: FastifyReply) {
+  const { userId } = request.body;
+
+  const user = await userService.getAllUsers({ id: userId, role: "owner" });
+
+  if (!user[0]) {
+    return reply.status(400).send({
+      message: "Owner account not found.",
     });
   }
 

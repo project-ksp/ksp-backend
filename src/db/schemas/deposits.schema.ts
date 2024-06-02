@@ -36,3 +36,9 @@ export const addDepositSchema = createInsertSchema(deposits, {
   mandatoryDeposit: true,
   voluntaryDeposit: true,
 });
+
+export const updateDepositSchema = createInsertSchema(deposits).omit({
+  memberId: true,
+  createdAt: true,
+  updatedAt: true,
+});

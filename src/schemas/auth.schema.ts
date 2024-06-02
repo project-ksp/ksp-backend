@@ -21,5 +21,16 @@ export const accessBranchSchema = {
   } as const,
 };
 
+export const accessOwnerSchema = {
+  body: {
+    type: "object",
+    required: ["userId"],
+    properties: {
+      userId: { type: "number" },
+    },
+  } as const,
+};
+
 export type LoginSchema = SchemaToRequestTypes<typeof loginSchema>;
 export type AccessBranchSchema = SchemaToRequestTypes<typeof accessBranchSchema>;
+export type AccessOwnerSchema = SchemaToRequestTypes<typeof accessOwnerSchema>;

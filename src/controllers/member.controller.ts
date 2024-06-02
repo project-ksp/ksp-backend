@@ -2,6 +2,8 @@ import type { FastifyReply, FastifyRequest } from "fastify";
 import * as branchService from "@/services/branch.service";
 import * as memberService from "@/services/member.service";
 import * as pdfService from "@/services/pdf.service";
+import * as loanService from "@/services/loan.service";
+import * as depositService from "@/services/deposit.service";
 import type {
   AddLoanMemberSchema,
   CalculateDepositExistingMemberSchema,
@@ -14,7 +16,13 @@ import type {
   ShowMemberSchema,
   UpdateMemberSchema,
 } from "@/schemas/member.schema";
-import { addDepositSchema, insertMemberSchema, updateMemberSchema } from "@/db/schemas";
+import {
+  addDepositSchema,
+  insertMemberSchema,
+  updateMemberSchema,
+  updateDepositSchema,
+  updateLoanSchema,
+} from "@/db/schemas";
 import { fromError } from "zod-validation-error";
 import { addLoanSchema, insertLoanSchema } from "@/db/schemas/loans.schema";
 
@@ -101,12 +109,6 @@ export async function show(request: FastifyRequest<ShowMemberSchema>, reply: Fas
     });
   }
 
-  if (request.user.role !== "owner" && data.branchId !== request.user.branchId) {
-    return reply.status(403).send({
-      message: "Forbidden.",
-    });
-  }
-
   reply.send({
     message: "Member successfully fetched.",
     data,
@@ -182,19 +184,72 @@ export async function createWithLoan(request: FastifyRequest<CreateLoanMemberSch
 
 export async function update(request: FastifyRequest<UpdateMemberSchema>, reply: FastifyReply) {
   const { id } = request.params;
-  const validated = updateMemberSchema.safeParse(request.body);
+  const { member, deposit, loans } = request.body;
+  const { role } = request.user;
+  const validatedDataMember = updateMemberSchema.safeParse(member);
+  const validatedDataDeposit = updateDepositSchema.safeParse(deposit);
+  const validatedLoans = loans.map((loan) => updateLoanSchema.safeParse(loan));
 
-  if (!validated.success) {
+  if (!validatedDataMember.success) {
     return reply.status(400).send({
-      message: fromError(validated.error).toString(),
+      message: fromError(validatedDataMember.error).toString(),
+    });
+  }
+
+  if (role !== "branch_head") {
+    try {
+      const member = await memberService.updateMember(id, validatedDataMember.data);
+      reply.send({
+        message: "Member successfully updated.",
+        data: member,
+      });
+    } catch (error) {
+      return reply.status(400).send({
+        message: error instanceof Error ? error.message : "An error occurred.",
+      });
+    }
+
+    return;
+  }
+
+  if (!validatedDataDeposit.success) {
+    return reply.status(400).send({
+      message: fromError(validatedDataDeposit.error).toString(),
+    });
+  }
+
+  const failedLoan = validatedLoans.find((loan) => !loan.success);
+  if (failedLoan) {
+    return reply.status(400).send({
+      message: fromError(failedLoan.error).toString(),
+    });
+  }
+
+  const { id: depositId } = validatedDataDeposit.data;
+  delete validatedDataDeposit.data.id;
+  const loansId = validatedLoans.map((loan) => loan.data?.id);
+  validatedLoans.forEach((loan) => delete loan.data?.id);
+  if (!depositId) {
+    return reply.status(400).send({
+      message: "Deposit ID is required.",
+    });
+  }
+
+  if (loansId.some((id) => !id)) {
+    return reply.status(400).send({
+      message: "Loan ID is required.",
     });
   }
 
   try {
-    const member = await memberService.updateMember(id, validated.data);
+    const member = await memberService.updateMember(id, validatedDataMember.data);
+    const depositData = await depositService.updateDeposit(depositId, validatedDataDeposit.data);
+    const loansData = await Promise.all(
+      loansId.map(async (id, index) => loanService.updateLoan(id ?? 0, validatedLoans[index]?.data)),
+    );
     reply.send({
       message: "Member successfully updated.",
-      data: member,
+      data: { member, deposit: depositData, loans: loansData },
     });
   } catch (error) {
     return reply.status(400).send({

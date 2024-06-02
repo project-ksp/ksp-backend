@@ -79,6 +79,15 @@ export const updateMemberSchema = {
       id: { type: "string" },
     },
   } as const,
+  body: {
+    type: "object",
+    required: ["member", "deposit", "loans"],
+    properties: {
+      member: { type: "object" },
+      deposit: { type: "object" },
+      loans: { type: "array", items: { type: "object" } },
+    },
+  } as const,
 };
 
 export const updateStatusMemberSchema = {

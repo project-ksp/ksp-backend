@@ -1,5 +1,5 @@
 import * as authController from "@/controllers/auth.controller";
-import { accessBranchSchema, loginSchema } from "@/schemas/auth.schema";
+import { accessBranchSchema, loginSchema, accessOwnerSchema } from "@/schemas/auth.schema";
 import type { FastifyInstance } from "fastify";
 
 const authRoutes = async (fastify: FastifyInstance) => {
@@ -13,6 +13,14 @@ const authRoutes = async (fastify: FastifyInstance) => {
       preHandler: [fastify.authorize(["owner"])],
     },
     authController.authenticateAsBranchHead,
+  );
+  fastify.post(
+    "/access-owner",
+    {
+      schema: accessOwnerSchema,
+      preHandler: [fastify.authorize(["branch_head"])],
+    },
+    authController.authenticateAsOwner,
   );
 };
 

@@ -46,7 +46,6 @@ export async function getAllBranches() {
         totalSavingSum,
       };
     });
-
     return sq.sort((a, b) => a.id - b.id);
   } catch (error) {
     console.error(error);

@@ -487,6 +487,8 @@ export async function generateMemberListBook(branchId: number) {
     }),
   ]);
 
+  allMembers[1] = allMembers[1].filter((member) => member.deleteRequests.status === "disetujui");
+
   const members = allMembers[0].concat(allMembers[1]);
   const buffer = await readDocument("Buku Daftar Anggota.pdf");
   const ttdImageBuffer = await readImage("TTD_Ketua.png");

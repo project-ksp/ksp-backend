@@ -241,14 +241,16 @@ export async function update(request: FastifyRequest<UpdateMemberSchema>, reply:
     });
   }
 
+  let isActive = true;
+
   if (validatedDataDeposit.data.principalDeposit < 50000) {
-    validatedDataMember.data.isActive = false;
+    isActive = false;
   } else {
-    validatedDataMember.data.isActive = true;
+    isActive = true;
   }
 
   try {
-    const member = await memberService.updateMember(id, validatedDataMember.data);
+    const member = await memberService.updateMember(id, { ...validatedDataMember.data, isActive });
     const depositData = await depositService.updateDeposit(depositId, validatedDataDeposit.data);
     const loansData = await Promise.all(
       loansId.map(async (id, index) => loanService.updateLoan(id ?? 0, validatedLoans[index]?.data)),

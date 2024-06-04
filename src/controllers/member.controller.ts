@@ -241,6 +241,12 @@ export async function update(request: FastifyRequest<UpdateMemberSchema>, reply:
     });
   }
 
+  if (validatedDataDeposit.data.principalDeposit < 50000) {
+    validatedDataMember.data.isActive = false;
+  } else {
+    validatedDataMember.data.isActive = true;
+  }
+
   try {
     const member = await memberService.updateMember(id, validatedDataMember.data);
     const depositData = await depositService.updateDeposit(depositId, validatedDataDeposit.data);

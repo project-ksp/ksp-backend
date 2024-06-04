@@ -1,33 +1,57 @@
 import { db } from "@/db";
-import { branchHeads, branches, leaders, members, users } from "@/db/schemas";
+import { branchHeads, branches, leaders, members, users, loans, deposits } from "@/db/schemas";
 import { getTableColumns, eq, sql, count, asc } from "drizzle-orm";
 
 export async function getAllBranches() {
-  const sq = db
-    .select({
-      branchId: members.branchId,
-      totalLoanSum: sql<number>`0`.as("totalLoanSum"),
-      totalSavingSum: sql<number>`0`.as("totalSavingSum"),
-      activeCount: sql<number>`SUM(CASE WHEN ${members.isActive} = true THEN 1 ELSE 0 END)`.as("activeCount"),
-      inactiveCount: sql<number>`SUM(CASE WHEN ${members.isActive} = false THEN 1 ELSE 0 END)`.as("inactiveCount"),
-    })
-    .from(members)
-    .groupBy(members.branchId)
-    .as("memberSq");
+  try {
+    const totalLoanSum = await db
+      .select({
+        branchId: loans.branchId,
+        totalLoanSum: sql<number>`SUM(${loans.loan}) as totalLoanSum`,
+      })
+      .from(loans)
+      .groupBy(loans.branchId);
+    const branchHeadData = await db
+      .select({
+        ...getTableColumns(branches),
+        headName: branchHeads.name,
+      })
+      .from(branches)
+      .leftJoin(branchHeads, eq(branches.id, branchHeads.branchId))
+      .orderBy(asc(branches.id));
+    const data = await db
+      .select({
+        branchId: members.branchId,
+        totalPrincipalDeposit: sql<number>`SUM(${deposits.principalDeposit}) as totalPrincipalDeposit`,
+        totalMandatoryDeposit: sql<number>`SUM(${deposits.mandatoryDeposit}) as totalMandatoryDeposit`,
+        totalVoluntaryDeposit: sql<number>`SUM(${deposits.voluntaryDeposit}) as totalVoluntaryDeposit`,
+        activeCount: sql<number>`SUM(CASE WHEN ${members.isActive} = true THEN 1 ELSE 0 END)`.as("activeCount"),
+        inactiveCount: sql<number>`SUM(CASE WHEN ${members.isActive} = false THEN 1 ELSE 0 END)`.as("inactiveCount"),
+      })
+      .from(members)
+      .leftJoin(deposits, eq(members.id, deposits.memberId))
+      .groupBy(members.branchId);
+    
+    const sq = data.map((item) => {
+      const totalLoan = totalLoanSum.find((loan) => loan.branchId === item.branchId);
+      const branchHead = branchHeadData.find((head) => head.id === item.branchId);
+      const totalSavingSum =
+        Number(item.totalPrincipalDeposit) + Number(item.totalMandatoryDeposit) + Number(item.totalVoluntaryDeposit);
+      return {
+        id: item.branchId,
+        ...branchHead,
+        activeCount: item.activeCount,
+        inactiveCount: item.inactiveCount,
+        totalLoanSum: totalLoan?.totalLoanSum ?? 0,
+        totalSavingSum,
+      };
+    });
 
-  return db
-    .select({
-      ...getTableColumns(branches),
-      totalLoanSum: sq.totalLoanSum,
-      totalSavingSum: sq.totalSavingSum,
-      activeCount: sq.activeCount,
-      inactiveCount: sq.inactiveCount,
-      headName: branchHeads.name,
-    })
-    .from(branches)
-    .leftJoin(sq, eq(branches.id, sq.branchId))
-    .leftJoin(branchHeads, eq(branches.id, branchHeads.branchId))
-    .orderBy(asc(branches.id));
+    return sq.sort((a, b) => a.id - b.id);
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 }
 
 export async function getBranchById(id: number) {

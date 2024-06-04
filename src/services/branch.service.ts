@@ -31,7 +31,7 @@ export async function getAllBranches() {
       .from(members)
       .leftJoin(deposits, eq(members.id, deposits.memberId))
       .groupBy(members.branchId);
-
+    
     const sq = data.map((item) => {
       const totalLoan = totalLoanSum.find((loan) => loan.branchId === item.branchId);
       const branchHead = branchHeadData.find((head) => head.id === item.branchId);
@@ -46,7 +46,6 @@ export async function getAllBranches() {
         totalSavingSum,
       };
     });
-
     return sq.sort((a, b) => a.id - b.id);
   } catch (error) {
     console.error(error);

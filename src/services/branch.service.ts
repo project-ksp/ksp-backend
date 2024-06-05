@@ -49,7 +49,6 @@ export async function getAllBranches() {
         totalSavingSum: isNaN(totalSavingSum) ? 0 : totalSavingSum,
       };
     });
-
     return sq.sort((a, b) => a.id - b.id);
   } catch (error) {
     console.error(error);

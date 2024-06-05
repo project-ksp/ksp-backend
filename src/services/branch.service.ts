@@ -11,7 +11,7 @@ export async function getAllBranches() {
       })
       .from(loans)
       .groupBy(loans.branchId);
-    const branchHeadData = await db
+    const branchData = await db
       .select({
         ...getTableColumns(branches),
         headName: branchHeads.name,
@@ -19,6 +19,7 @@ export async function getAllBranches() {
       .from(branches)
       .leftJoin(branchHeads, eq(branches.id, branchHeads.branchId))
       .orderBy(asc(branches.id));
+
     const data = await db
       .select({
         branchId: members.branchId,
@@ -31,19 +32,21 @@ export async function getAllBranches() {
       .from(members)
       .leftJoin(deposits, eq(members.id, deposits.memberId))
       .groupBy(members.branchId);
-    
-    const sq = data.map((item) => {
-      const totalLoan = totalLoanSum.find((loan) => loan.branchId === item.branchId);
-      const branchHead = branchHeadData.find((head) => head.id === item.branchId);
+
+    const sq = branchData.map((item) => {
+      const totalLoan = totalLoanSum.find((loan) => loan.branchId === item.id);
+      const dataItem = data.find((data) => data.branchId === item.id);
       const totalSavingSum =
-        Number(item.totalPrincipalDeposit) + Number(item.totalMandatoryDeposit) + Number(item.totalVoluntaryDeposit);
+        Number(dataItem?.totalPrincipalDeposit) +
+        Number(dataItem?.totalMandatoryDeposit) +
+        Number(dataItem?.totalVoluntaryDeposit);
+
       return {
-        id: item.branchId,
-        ...branchHead,
-        activeCount: item.activeCount,
-        inactiveCount: item.inactiveCount,
-        totalLoanSum: totalLoan?.totalLoanSum ?? 0,
-        totalSavingSum,
+        ...item,
+        activeCount: dataItem?.activeCount ?? 0,
+        inactiveCount: dataItem?.inactiveCount ?? 0,
+        totalLoanSum: totalLoan ? Number(totalLoan.totalLoanSum) : 0,
+        totalSavingSum: isNaN(totalSavingSum) ? 0 : totalSavingSum,
       };
     });
     return sq.sort((a, b) => a.id - b.id);

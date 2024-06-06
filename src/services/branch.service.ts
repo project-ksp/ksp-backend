@@ -69,16 +69,14 @@ export async function getBranchById(id: number) {
     .select({
       ...getTableColumns(branches),
       leaderCount: sql<number>`COUNT(DISTINCT ${leaders.id})`.as("leaderCount"),
+      accountCount: sql<number>`${accountCount?.accountCount ?? 0}`.as("accountCount"),
     })
     .from(branches)
     .leftJoin(leaders, eq(branches.id, leaders.branchId))
     .where(eq(branches.id, id))
     .groupBy(branches.id);
 
-  return {
-    ...branch,
-    accountCount: accountCount?.accountCount ?? 0,
-  };
+  return branch;
 }
 
 export async function createBranch(data: typeof branches.$inferInsert) {

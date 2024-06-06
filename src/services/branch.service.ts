@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { branchHeads, branches, leaders, members, users, loans, deposits } from "@/db/schemas";
-import { getTableColumns, eq, sql, count, asc } from "drizzle-orm";
+import { getTableColumns, eq, sql, asc } from "drizzle-orm";
 
 export async function getAllBranches() {
   try {

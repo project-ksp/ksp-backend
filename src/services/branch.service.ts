@@ -57,19 +57,28 @@ export async function getAllBranches() {
 }
 
 export async function getBranchById(id: number) {
+  const [accountCount] = await db
+    .select({
+      accountCount: sql<number>`SUM(CASE WHEN ${users.role} = 'owner' THEN 0 ELSE 1 END)`.as("accountCount"),
+    })
+    .from(users)
+    .where(eq(users.branchId, id))
+    .groupBy(users.branchId);
+
   const [branch] = await db
     .select({
       ...getTableColumns(branches),
-      accountCount: sql<number>`SUM(CASE WHEN ${eq(users.role, "owner")} THEN 0 ELSE 1 END)`.as("accountCount"),
-      leaderCount: count(leaders.id).as("leaderCount"),
+      leaderCount: sql<number>`COUNT(DISTINCT ${leaders.id})`.as("leaderCount"),
     })
     .from(branches)
-    .where(eq(branches.id, id))
-    .leftJoin(users, eq(branches.id, users.branchId))
     .leftJoin(leaders, eq(branches.id, leaders.branchId))
+    .where(eq(branches.id, id))
     .groupBy(branches.id);
 
-  return branch;
+  return {
+    ...branch,
+    accountCount: accountCount?.accountCount ?? 0,
+  };
 }
 
 export async function createBranch(data: typeof branches.$inferInsert) {

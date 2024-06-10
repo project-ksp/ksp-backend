@@ -486,8 +486,7 @@ export async function generateMemberListBook(branchId: number) {
       where: { branchId, isActive: false },
     }),
   ]);
-
-  allMembers[1] = allMembers[1].filter((member) => member.deleteRequests.status === "disetujui");
+  allMembers[1] = allMembers[1].filter((member) => member.deleteRequests?.status === "disetujui");
 
   const members = allMembers[0].concat(allMembers[1]);
   const buffer = await readDocument("Buku Daftar Anggota.pdf");

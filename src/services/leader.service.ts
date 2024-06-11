@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { leaders, members, type insertLeaderSchema, type updateLeaderSchema } from "@/db/schemas";
-import { and, count, eq, sql } from "drizzle-orm";
+import { and, asc, count, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import * as uploadService from "@/services/upload.service";
 
@@ -27,7 +27,8 @@ export async function getAllLeaders({ where = {} }: { where?: Partial<typeof lea
       leaders.city,
       leaders.phoneNumber,
       leaders.birthDate,
-    );
+    )
+    .orderBy(asc(leaders.id));
 }
 
 export async function getLeaderById(id: string, branchId: number) {

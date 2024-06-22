@@ -86,7 +86,7 @@ export async function search(request: FastifyRequest<SearchMemberSchema>, reply:
 
   try {
     const data = await memberService.getAllMembers({
-      query: { id: query },
+      query: { name: query, id: query, nik: query },
     });
     reply.send({
       message: "Members successfully fetched.",
@@ -245,8 +245,6 @@ export async function update(request: FastifyRequest<UpdateMemberSchema>, reply:
 
   if (validatedDataDeposit.data.principalDeposit < 50000) {
     isActive = false;
-  } else {
-    isActive = true;
   }
 
   try {

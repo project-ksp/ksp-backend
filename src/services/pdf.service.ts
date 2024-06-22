@@ -49,7 +49,7 @@ export async function generateMemberCard(id: string) {
     font: helveticaFont,
   });
 
-  page.drawText(member.branch.address, {
+  page.drawText(member.branch.city, {
     x: 21,
     y: 13,
     size: 8,
@@ -311,6 +311,14 @@ export async function generateRegistrationForm(id: string) {
     size: 10,
     font: helveticaFont,
   });
+
+  pages[1]!.drawText(member.branch.city, {
+    x: 43,
+    y: height - 488,
+    size: 10,
+    font: helveticaFont,
+  });
+
   pages[1]!.drawText(
     new Date(joinDate).toLocaleDateString("id-ID", {
       day: "numeric",
@@ -499,7 +507,7 @@ export async function generateMemberListBook(branchId: number) {
   const { height: firstPageHeight } = pages[0]!.getSize();
   const totalPage = Math.ceil(members.length / 20);
 
-  pages[0]!.drawText(branch.kecamatan, {
+  pages[0]!.drawText(branch.city, {
     x: 170,
     y: firstPageHeight - 325,
     size: 14,
@@ -567,14 +575,14 @@ export async function generateMemberListBook(branchId: number) {
       page.drawText(member.occupation, {
         x: 387,
         y,
-        size: 7,
+        size: 5,
         font: helveticaFont,
       });
 
       page.drawText(member.address, {
         x: 465,
         y,
-        size: 7,
+        size: 6,
         font: helveticaFont,
       });
 

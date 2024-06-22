@@ -145,7 +145,7 @@ export async function getMemberById(id: string) {
       },
       branch: {
         columns: {
-          address: true,
+          city: true,
         },
       },
     },

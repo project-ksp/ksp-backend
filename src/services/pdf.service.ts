@@ -632,7 +632,7 @@ export async function generateMemberListBook(branchId: number) {
 
         page.drawImage(ttdImage, {
           x: 883,
-          y,
+          y: y - 6,
           width: 15,
           height: 15,
         });

@@ -530,7 +530,7 @@ export async function generateMemberListBook(branchId: number) {
   for (let i = 0; i < totalPage; i++) {
     const page = pdfDoc.getPages()[i + 1]!;
     const { height } = page.getSize();
-    let y = height - 123;
+    let y = height - 115;
     for (let j = 0; j < 19; j++) {
       if (currentMember >= members.length) {
         break;
@@ -541,46 +541,46 @@ export async function generateMemberListBook(branchId: number) {
       page.drawText(member.id, {
         x: 40,
         y,
-        size: 8,
+        size: 6,
         font: helveticaFont,
       });
 
       page.drawText(member.name, {
         x: 100,
         y,
-        size: 8,
+        size: 6,
         font: helveticaFont,
       });
       page.drawText(member.nik, {
-        x: 220,
+        x: 198,
         y,
-        size: 8,
+        size: 6,
         font: helveticaFont,
       });
 
       page.drawText(memberAge.toString(), {
-        x: 335,
+        x: 290,
         y,
-        size: 8,
+        size: 6,
         font: helveticaFont,
       });
 
       page.drawText(member.gender.charAt(0).toUpperCase(), {
-        x: 360,
+        x: 319,
         y,
-        size: 8,
+        size: 6,
         font: helveticaFont,
       });
 
       page.drawText(member.occupation, {
-        x: 387,
+        x: 340,
         y,
-        size: 5,
+        size: 6,
         font: helveticaFont,
       });
 
       page.drawText(member.address, {
-        x: 465,
+        x: 435,
         y,
         size: 6,
         font: helveticaFont,
@@ -593,17 +593,17 @@ export async function generateMemberListBook(branchId: number) {
           year: "numeric",
         }),
         {
-          x: 536,
+          x: 575,
           y,
-          size: 8,
+          size: 6,
           font: helveticaFont,
         },
       );
       const ttdImage = await pdfDoc.embedPng(ttdImageBuffer);
 
       page.drawImage(ttdImage, {
-        x: 715,
-        y,
+        x: 725,
+        y: y - 6,
         width: 15,
         height: 15,
       });
@@ -616,22 +616,22 @@ export async function generateMemberListBook(branchId: number) {
             year: "numeric",
           }),
           {
-            x: 757,
+            x: 765,
             y,
-            size: 8,
+            size: 6,
             font: helveticaFont,
           },
         );
 
         page.drawText(member.deleteRequests.reason, {
-          x: 797,
+          x: 807,
           y,
           size: 6,
           font: helveticaFont,
         });
 
         page.drawImage(ttdImage, {
-          x: 875,
+          x: 883,
           y,
           width: 15,
           height: 15,

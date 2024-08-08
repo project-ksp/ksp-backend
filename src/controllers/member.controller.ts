@@ -61,6 +61,33 @@ export async function indexRecap(request: FastifyRequest, reply: FastifyReply) {
   });
 }
 
+export async function memberBookData(request: FastifyRequest, reply: FastifyReply) {
+  const branch = await branchService.getBranchById(request.user.branchId);
+  if (!branch) {
+    return reply.status(400).send({
+      message: "Branch not found.",
+    });
+  }
+
+  const allMembers = await Promise.all([
+    memberService.getAllMembersWithDeletion({
+      where: { branchId: request.user.branchId, isActive: true },
+      limit: branch.publishAmount,
+    }),
+    memberService.getAllMembersWithDeletion({
+      where: { branchId: request.user.branchId, isActive: false },
+    }),
+  ]);
+  allMembers[1] = allMembers[1].filter((member) => member.deleteRequests?.status === "disetujui");
+
+  const data = allMembers[0].concat(allMembers[1]);
+
+  reply.send({
+    message: "Members successfully fetched.",
+    data,
+  });
+}
+
 export async function indexPending(request: FastifyRequest, reply: FastifyReply) {
   const data = await memberService.getAllMembers({
     where: { branchId: request.user.branchId },

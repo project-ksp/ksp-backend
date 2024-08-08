@@ -3,13 +3,14 @@ import memberFactory from "../factories/member.factory";
 import { members } from "../schemas/members.schema";
 
 export default async function seed() {
-  const memberData = await Promise.all(Array.from({ length: 1000 }, memberFactory));
+  const memberData = await Promise.all(Array.from({ length: 3000 }, memberFactory));
   const branches = await db.query.branches.findMany();
   const leaders = await db.query.leaders.findMany();
   const users = await db.query.users.findMany();
 
-  const branchesPerBatch = Math.floor(memberData.length / branches.length);
-  for (let i = 0; i < branches.length; i++) {
+  // const branchesPerBatch = Math.floor(memberData.length / branches.length);
+  const branchesPerBatch = Math.floor(3000);
+  for (let i = 0; i < 1; i++) {
     for (let j = 0; j < branchesPerBatch; j++) {
       const member = memberData[i * branchesPerBatch + j]!;
       const branch = branches[i]!;

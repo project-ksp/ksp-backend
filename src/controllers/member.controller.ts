@@ -30,7 +30,15 @@ export async function index(request: FastifyRequest<IndexMemberSchema>, reply: F
   const { page } = request.query;
 
   try {
-    const data = await memberService.getAllMembersWithPagination(page);
+    let data;
+
+    if (page) {
+      data = await memberService.getAllMembersWithPagination(page);
+    } else {
+      // If the page parameter is not provided, fetch all members
+      data = await memberService.getAllMembers({});
+    }
+
     reply.send({
       message: "Members successfully fetched.",
       data,
